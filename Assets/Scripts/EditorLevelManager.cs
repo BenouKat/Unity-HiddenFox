@@ -173,12 +173,12 @@ public class EditorLevelManager : MonoBehaviour {
 		}
 		
 		//Debug inputs
-		if(Input.GetKeyDown(KeyCode.O) && EDITMODE == EDITMODE.CUBE)
+		if(Input.GetKeyDown(KeyCode.O) && actualMode == EDITMODE.CUBE)
 		{
 			goOnSpawnPlayerMode();	
 		}
 		
-		if(Input.GetKeyDown(KeyCode.U) && EDITMODE == EDITMODE.CUBE)
+		if(Input.GetKeyDown(KeyCode.U) && actualMode == EDITMODE.CUBE)
 		{
 			goOnSpawnEnemy();
 		}
@@ -195,7 +195,7 @@ public class EditorLevelManager : MonoBehaviour {
 			}
 		}
 		
-		if(Input.GetKeyDown(KeyCode.T) && (EDITMODE == EDITMODE.EDITENEMY || EDITMODE == EDITMODE.TESTENEMY) && actualEnemyEdit.isValidEnemy(actualLevel))
+		if(Input.GetKeyDown(KeyCode.T) && (actualMode == EDITMODE.EDITENEMY || actualMode == EDITMODE.TESTENEMY) && actualEnemyEdit.isValidEnemy(actualLevel))
 		{
 			if(!inEnemyTest)
 			{

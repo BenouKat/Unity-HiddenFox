@@ -81,6 +81,7 @@ public class Enemy : MonoBehaviour{
 				break;
 			case MOVE.LEFT:
 				transform.Translate(0f, 0f, speed*Time.deltaTime, Space.World);
+				break;
 			}
 			spriteAnim.anim();
 			if(Vector3.Distance(transform.position, convertToVector3(nextPosition)) <= distanceValid)
@@ -157,25 +158,25 @@ public class Enemy : MonoBehaviour{
 		{
 			case MOVE.LEFT:
 				isWaiting = false;
-				transform.position = new Vector3(nextPosition.z*2f, 2f, nextPosition.x*2f);
+				transform.position = convertToVector3(nextPosition);
 				nextPosition.x++;
 				spriteAnim.refreshPosition(LOOK.LEFT);
 				break;
 			case MOVE.RIGHT:
 				isWaiting = false;
-				transform.position = new Vector3(nextPosition.z*2f, 2f, nextPosition.x*2f);
+				transform.position = convertToVector3(nextPosition);
 				nextPosition.x--;
 				spriteAnim.refreshPosition(LOOK.RIGHT);
 				break;
 			case MOVE.UP:
 				isWaiting = false;
-				transform.position = new Vector3(nextPosition.z*2f, 2f, nextPosition.x*2f);
+				transform.position = convertToVector3(nextPosition);
 				nextPosition.y++;
 				spriteAnim.refreshPosition(LOOK.UP);
 				break;
 			case MOVE.DOWN:
 				isWaiting = false;
-				transform.position = new Vector3(nextPosition.z*2f, 2f, nextPosition.x*2f);
+				transform.position = convertToVector3(nextPosition);
 				nextPosition.y--;
 				spriteAnim.refreshPosition(LOOK.DOWN);
 				break;
@@ -212,7 +213,7 @@ public class Enemy : MonoBehaviour{
 	
 	Vector3 convertToVector3(Vector2 pos)
 	{
-		poolVector3.x = pos.z*2f;
+		poolVector3.x = pos.y*2f;
 		poolVector3.y = 2f;
 		poolVector3.z = pos.x*2f;
 		return poolVector3;
