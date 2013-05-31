@@ -4,7 +4,8 @@ using System.Collections;
 public enum BLOCSTATE{
 	EMPTY,
 	CUBE,
-	PLAYERSTART
+	PLAYERSTART,
+	ENEMYSTART
 }
 
 public class Level{
@@ -33,7 +34,7 @@ public class Level{
 	public void removeCube(int w, int h, int v)
 	{
 		levelState[w,h,v] = BLOCSTATE.EMPTY;
-		Destroy(gameObjectList[w,h,v]);
+		GameObject.Destroy(gameObjectList[w,h,v]);
 		gameObjectList[w,h,v] = null;
 	}
 	
@@ -42,14 +43,14 @@ public class Level{
 		return gameObjectList[w,h,v];
 	}
 	
-	public bool getBlocState(int w, int h, int v)
+	public BLOCSTATE getBlocState(int w, int h, int v)
 	{
 		return levelState[w, h, v];
 	}	
 	
 	public bool isDestroyable(int w, int h, int v)
 	{
-		return v != 0 || w != startPlayerPosition.x || h != startPlayerPosition.y;
+		return v != 0 || ((w != startPlayerPosition.x || h != startPlayerPosition.y) && levelState[w,h,1] != BLOCSTATE.ENEMYSTART);
 	}
 	
 	public void setDisplayUpperBlocs(bool show, int maxWidth, int maxHeight, int maxVolume, int actualVolume)
@@ -60,7 +61,7 @@ public class Level{
 			{
 				for(int h=actualVolume+1; h<maxVolume; h++)
 				{
-					if(!isEmpty(i,j,h))
+					if(getBlocState(i,j,h) == BLOCSTATE.CUBE)
 					{
 						gameObjectList[i,j,h].renderer.enabled = show;
 					}
@@ -75,7 +76,7 @@ public class Level{
 		{
 			for(int j=0; j<maxHeight; j++)
 			{
-				if(!isEmpty(i,j,actualVolume))
+				if(getBlocState(i,j,actualVolume) == BLOCSTATE.CUBE)
 				{
 					gameObjectList[i,j,actualVolume].renderer.enabled = show;
 				}
@@ -85,14 +86,27 @@ public class Level{
 	
 	public void setStartPlayerPosition(int width, int height)
 	{
-		levelState[w,h,1] = BLOCSTATE.PLAYERSTART;
+		levelState[width, height, 1] = BLOCSTATE.PLAYERSTART;
 		startPlayerPosition = new Vector2((float)width, (float)height);
 		playerPositionSet = true;
 	}
 	
+	public void setStartEnemyPosition(int width, int height, GameObject go)
+	{
+		levelState[width, height, 1] = BLOCSTATE.ENEMYSTART;
+		gameObjectList[width, height, 1] = go;
+	}
+	
 	public void removePlayerPosition()
 	{
-		levelState[startPlayerPosition.x,startPlayerPosition.y,1] = BLOCSTATE.EMPTY;
+		levelState[(int)startPlayerPosition.x,(int)startPlayerPosition.y,1] = BLOCSTATE.EMPTY;
 		playerPositionSet = false;
+	}
+	
+	public void removeEnemyPosition(int width, int height)
+	{
+		levelState[width, height, 1] = BLOCSTATE.EMPTY;
+		GameObject.Destroy(gameObjectList[width, height, 1]);
+		gameObjectList[width, height, 1] = null;
 	}
 }

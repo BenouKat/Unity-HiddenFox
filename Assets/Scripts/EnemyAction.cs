@@ -11,6 +11,9 @@ public enum MOVE{
 	LOOKRIGHT,
 	LOOKUP,
 	LOOKDOWN,
+	POWER1,
+	POWER2,
+	POWER3
 }
 
 public class EnemyAction{
@@ -20,7 +23,7 @@ public class EnemyAction{
 	
 	public float timeWait;
 	
-	public EnemyAction(MOVE action, int waiting)
+	public EnemyAction(MOVE action, float waiting)
 	{
 		if(action < MOVE.WAIT)
 		{

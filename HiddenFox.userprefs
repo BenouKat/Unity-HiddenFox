@@ -2,8 +2,12 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\EditorLevelManager.cs">
     <Files>
-      <File FileName="Assets\Scripts\EditorLevelManager.cs" Line="76" Column="28" />
-      <File FileName="Assets\Scripts\Level.cs" Line="32" Column="3" />
+      <File FileName="Assets\Scripts\EditorLevelManager.cs" Line="1062" Column="43" />
+      <File FileName="Assets\Scripts\Player.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Enemy.cs" Line="212" Column="25" />
+      <File FileName="Assets\Scripts\AnimationSprite.cs" Line="26" Column="20" />
+      <File FileName="Assets\Scripts\Level.cs" Line="109" Column="56" />
+      <File FileName="Assets\Scripts\EnemyAction.cs" Line="16" Column="8" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
