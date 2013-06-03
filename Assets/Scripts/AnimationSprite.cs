@@ -47,9 +47,9 @@ public class AnimationSprite {
 		}
 	}
 	
-	public void idle()
+	public void idle(bool forceRefresh = false)
 	{
-		if(!isIDLE)
+		if(!isIDLE || forceRefresh)
 		{
 			time = frameRate;
 			animationState = 0;

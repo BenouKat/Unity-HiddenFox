@@ -135,7 +135,8 @@
      <Compile Include="Assets\Scripts\Enemy.cs" />
      <Compile Include="Assets\Scripts\EnemyAction.cs" />
      <Compile Include="Assets\Scripts\EventButtonEditor.cs" />
-     <Compile Include="Assets\Scripts\Level.cs" />
+     <Compile Include="Assets\Scripts\Gameplay.cs" />
+     <Compile Include="Assets\Scripts\LevelEditor.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Depth Cutout.shader" />
      <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />

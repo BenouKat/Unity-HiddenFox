@@ -1,13 +1,15 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\EditorLevelManager.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Enemy.cs">
     <Files>
-      <File FileName="Assets\Scripts\EditorLevelManager.cs" Line="1062" Column="43" />
-      <File FileName="Assets\Scripts\Player.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Enemy.cs" Line="212" Column="25" />
-      <File FileName="Assets\Scripts\AnimationSprite.cs" Line="26" Column="20" />
-      <File FileName="Assets\Scripts\Level.cs" Line="109" Column="56" />
+      <File FileName="Assets\Scripts\Enemy.cs" Line="184" Column="3" />
+      <File FileName="Assets\Scripts\EditorLevelManager.cs" Line="481" Column="6" />
+      <File FileName="Assets\Scripts\Player.cs" Line="22" Column="73" />
+      <File FileName="Assets\Scripts\AnimationSprite.cs" Line="61" Column="2" />
+      <File FileName="Assets\Scripts\LevelEditor.cs" Line="12" Column="2" />
       <File FileName="Assets\Scripts\EnemyAction.cs" Line="16" Column="8" />
+      <File FileName="Assets\Scripts\EventButtonEditor.cs" Line="16" Column="27" />
+      <File FileName="Assets\Scripts\Gameplay.cs" Line="10" Column="10" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

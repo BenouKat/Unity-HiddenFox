@@ -85,7 +85,7 @@ public class EditorLevelManager : MonoBehaviour {
 	private int actualSizeSelected;
 	
 	//Level construction
-	private Level actualLevel;
+	private LevelEditor actualLevel;
 	
 	//Coordonnée selectionnées
 	private int actualWidthSelected;
@@ -137,7 +137,7 @@ public class EditorLevelManager : MonoBehaviour {
 		actualSizeSelected = 0;
 		actualActionSelected = (int)MOVE.WAIT;
 		
-		actualLevel = new Level(maxWidth, maxHeight, maxVolume);
+		actualLevel = new LevelEditor(maxWidth, maxHeight, maxVolume);
 		
 		
 		for(int i = 0; i<widthLevelDefault; i++)
@@ -195,8 +195,9 @@ public class EditorLevelManager : MonoBehaviour {
 			}
 		}
 		
-		if(Input.GetKeyDown(KeyCode.T) && (actualMode == EDITMODE.EDITENEMY || actualMode == EDITMODE.TESTENEMY) && actualEnemyEdit.isValidEnemy(actualLevel))
+		if(Input.GetKeyDown(KeyCode.T) && ((actualMode == EDITMODE.EDITENEMY && actualEnemyEdit.isValidEnemy(actualLevel)) || (actualMode == EDITMODE.TESTENEMY)))
 		{
+			Debug.Log("Enemy valid");
 			if(!inEnemyTest)
 			{
 				inEnemyTest = true;
@@ -207,7 +208,6 @@ public class EditorLevelManager : MonoBehaviour {
 				cursorWayAction.SetActive(false);
 				possibleActionObject.SetActive(false);
 				panelUIEdit.SetActive(false);
-				actualMode = EDITMODE.CUBE;
 				oldWidthSelected = -1;
 				oldHeightSelected = -1;
 			}else{

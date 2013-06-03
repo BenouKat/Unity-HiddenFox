@@ -8,7 +8,7 @@ public enum BLOCSTATE{
 	ENEMYSTART
 }
 
-public class Level{
+public class LevelEditor{
 	
 	public BLOCSTATE[,,] levelState;
 	
@@ -18,7 +18,7 @@ public class Level{
 	
 	public bool playerPositionSet;
 	
-	public Level(int maxWidth, int maxHeight, int maxVolume)
+	public LevelEditor(int maxWidth, int maxHeight, int maxVolume)
 	{
 		startPlayerPosition = new Vector2(0f,0f);
 		levelState = new BLOCSTATE[maxWidth,maxHeight,maxVolume];

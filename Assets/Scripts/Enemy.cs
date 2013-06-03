@@ -33,6 +33,9 @@ public class Enemy : MonoBehaviour{
 	
 	public float distanceValid;
 	
+	private float distance;
+	private float oldDistance;
+	
 	private Vector3 poolVector3;
 	
 	private bool isInEditor;
@@ -60,7 +63,7 @@ public class Enemy : MonoBehaviour{
 	{
 		if(!isInEditor)
 		{
-			
+			UpdateAction();
 		}
 	}
 	
@@ -84,60 +87,19 @@ public class Enemy : MonoBehaviour{
 				break;
 			}
 			spriteAnim.anim();
-			if(Vector3.Distance(transform.position, convertToVector3(nextPosition)) <= distanceValid)
+			distance = Vector3.Distance(transform.position, convertToVector3(nextPosition));
+			if(distance <= distanceValid || distance > oldDistance)
 			{
 				nextAction();	
+			}else{
+				oldDistance = distance;	
 			}
 		}else if(timeForAction >= moveList[stateIndex].timeWait)
 		{
-			timeForAction = 0f;
 			nextAction();
 		}else{
 			timeForAction += Time.deltaTime;	
 		}
-	}
-	
-	
-	public bool isValidEnemy(Level thelevel)
-	{
-		var positionTMP = startPosition;
-		for(int i=0; i<moveList.Count; i++)
-		{
-			switch(moveList[i].state)
-			{
-				case MOVE.LEFT:
-					positionTMP.x++;
-					break;
-				case MOVE.RIGHT:
-					positionTMP.x--;
-					break;
-				case MOVE.UP:
-					positionTMP.y--;
-					break;
-				case MOVE.DOWN:
-					positionTMP.y--;
-					break;
-				default:
-					break;
-			}
-			
-			if(thelevel.getBlocState((int)positionTMP.x, (int)positionTMP.y, 0) != BLOCSTATE.CUBE && thelevel.getBlocState((int)positionTMP.x, (int)positionTMP.y, 1) == BLOCSTATE.CUBE)
-			{
-				return false;
-			}
-		}
-		
-		return positionTMP.x == startPosition.x && positionTMP.y == startPosition.y;
-	}
-	
-	public void addAction(MOVE action, float waiting)
-	{
-		moveList.Add(new EnemyAction(action, waiting));
-	}
-	
-	public void removeLastAction()
-	{
-		moveList.Remove(moveList.Last());
 	}
 	
 	public void nextAction()
@@ -187,40 +149,86 @@ public class Enemy : MonoBehaviour{
 			case MOVE.LOOKLEFT:
 				isWaiting = true;
 				spriteAnim.refreshPosition(LOOK.LEFT);
-				spriteAnim.idle();
+				spriteAnim.idle(true);
 				break;
 			case MOVE.LOOKRIGHT:
 				isWaiting = true;
 				spriteAnim.refreshPosition(LOOK.RIGHT);
-				spriteAnim.idle();
+				spriteAnim.idle(true);
 				break;
 			case MOVE.LOOKUP:
 				isWaiting = true;
 				spriteAnim.refreshPosition(LOOK.UP);
-				spriteAnim.idle();
+				spriteAnim.idle(true);
 				break;
 			case MOVE.LOOKDOWN:
 				isWaiting = true;
 				spriteAnim.refreshPosition(LOOK.DOWN);
-				spriteAnim.idle();
+				spriteAnim.idle(true);
 				break;
 			default:
 				isWaiting = true;
 				spriteAnim.idle();
 				break;
 		}
+		
+		oldDistance = Vector3.Distance(transform.position, convertToVector3(nextPosition));
 	}
 	
 	Vector3 convertToVector3(Vector2 pos)
 	{
 		poolVector3.x = pos.y*2f;
-		poolVector3.y = 2f;
+		poolVector3.y = 2.225f;
 		poolVector3.z = pos.x*2f;
 		return poolVector3;
 	}
 	
 	#region EDITOR
 	//EDITOR
+	public bool isValidEnemy(LevelEditor thelevel)
+	{
+		var positionTMP = startPosition;
+		
+		for(int i=0; i<moveList.Count; i++)
+		{
+			switch(moveList[i].state)
+			{
+				case MOVE.LEFT:
+					positionTMP.x++;
+					break;
+				case MOVE.RIGHT:
+					positionTMP.x--;
+					break;
+				case MOVE.UP:
+					positionTMP.y++;
+					break;
+				case MOVE.DOWN:
+					positionTMP.y--;
+					break;
+				default:
+					break;
+			}
+			
+			if(thelevel.getBlocState((int)positionTMP.x, (int)positionTMP.y, 0) != BLOCSTATE.CUBE && thelevel.getBlocState((int)positionTMP.x, (int)positionTMP.y, 1) == BLOCSTATE.CUBE)
+			{
+				return false;
+			}
+		}
+		
+		return (int)positionTMP.x == (int)startPosition.x && (int)positionTMP.y == (int)startPosition.y;
+	}
+	
+	public void addAction(MOVE action, float waiting)
+	{
+		moveList.Add(new EnemyAction(action, waiting));
+	}
+	
+	public void removeLastAction()
+	{
+		moveList.Remove(moveList.Last());
+	}
+	
+	
 	public Vector2 getLastPosition()
 	{
 		var positionTMP = startPosition;
