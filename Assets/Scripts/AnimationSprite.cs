@@ -102,4 +102,9 @@ public class AnimationSprite {
 		}
 	}
 	
+	public LOOK getActualLook()
+	{
+		return actualLook;	
+	}
+	
 }

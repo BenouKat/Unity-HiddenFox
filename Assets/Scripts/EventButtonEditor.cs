@@ -7,13 +7,25 @@ public class EventButtonEditor : MonoBehaviour {
 	
 	public bool isRight;
 	
+	public bool editEnemy;
+	
 	void OnClick()
 	{
-		if(isRight)
+		if(editEnemy)
 		{
-			elm.nextEnemeyAction();	
+			if(isRight)
+			{
+				elm.nextEnemeyAction();	
+			}else{
+				elm.prevEnemeyAction();	
+			}
 		}else{
-			elm.prevEnemeyAction();	
+			if(isRight)
+			{
+				elm.nextFile();	
+			}else{
+				elm.prevFile();	
+			}	
 		}
 	}
 }

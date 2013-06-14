@@ -3,11 +3,15 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 	
+	public GameObject cameraPlayer;
+	
 	private AnimationSprite spriteAnim;
 	
 	private UISprite sprite;
 	
 	public float speed;
+	
+	private Vector3 velocity = Vector3.zero;
 	
 	// Use this for initialization
 	void Start () {
@@ -22,6 +26,7 @@ public class Player : MonoBehaviour {
 			transform.parent.Translate(speed*Time.deltaTime, 0f , 0f, Space.World);
 			spriteAnim.refreshPosition(LOOK.UP);
 			spriteAnim.anim();
+			
 		}else if(Input.GetKey(KeyCode.DownArrow)){
 			transform.parent.Translate(-speed*Time.deltaTime, 0f, 0f, Space.World);
 			spriteAnim.refreshPosition(LOOK.DOWN);
@@ -37,5 +42,6 @@ public class Player : MonoBehaviour {
 		}else{
 			spriteAnim.idle();
 		}
+		cameraPlayer.transform.position = Vector3.SmoothDamp(cameraPlayer.transform.position, transform.parent.position, ref velocity, 0.1f);
 	}
 }

@@ -7,7 +7,6 @@ public class Gameplay : MonoBehaviour {
 	
 	private Player thePlayer;
 	
-	private 
 	
 	// Use this for initialization
 	void Start () {

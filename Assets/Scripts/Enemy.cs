@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+[System.Serializable]
 public enum LOOK
 {
 	RIGHT,
@@ -39,11 +40,14 @@ public class Enemy : MonoBehaviour{
 	private Vector3 poolVector3;
 	
 	private bool isInEditor;
+	private bool isGameStarted;
 	
-	private LOOK defaultLookAt;
+	public LOOK defaultLookAt;
 	
 	void Start()
 	{
+		transform.parent.collider.enabled = false;
+		isGameStarted = false;
 		stateIndex = 0;
 		timeForAction = 0f;
 		isWaiting = false;
@@ -59,9 +63,15 @@ public class Enemy : MonoBehaviour{
 		isInEditor = editorMode;
 	}
 	
+	public void go()
+	{
+		isGameStarted = true;
+		transform.parent.collider.enabled = true;
+	}
+	
 	void Update()
 	{
-		if(!isInEditor)
+		if(!isInEditor || isGameStarted)
 		{
 			UpdateAction();
 		}
@@ -74,20 +84,20 @@ public class Enemy : MonoBehaviour{
 			switch(moveList[stateIndex].state)
 			{
 			case MOVE.UP:
-				transform.Translate(speed*Time.deltaTime, 0f , 0f, Space.World);
+				transform.parent.Translate(speed*Time.deltaTime, 0f , 0f, Space.World);
 				break;
 			case MOVE.DOWN:
-				transform.Translate(-speed*Time.deltaTime, 0f , 0f, Space.World);
+				transform.parent.Translate(-speed*Time.deltaTime, 0f , 0f, Space.World);
 				break;
 			case MOVE.RIGHT:
-				transform.Translate(0f, 0f , -speed*Time.deltaTime, Space.World);
+				transform.parent.Translate(0f, 0f , -speed*Time.deltaTime, Space.World);
 				break;
 			case MOVE.LEFT:
-				transform.Translate(0f, 0f, speed*Time.deltaTime, Space.World);
+				transform.parent.Translate(0f, 0f, speed*Time.deltaTime, Space.World);
 				break;
 			}
 			spriteAnim.anim();
-			distance = Vector3.Distance(transform.position, convertToVector3(nextPosition));
+			distance = Vector3.Distance(transform.parent.position, convertToVector3(nextPosition));
 			if(distance <= distanceValid || distance > oldDistance)
 			{
 				nextAction();	
@@ -120,25 +130,25 @@ public class Enemy : MonoBehaviour{
 		{
 			case MOVE.LEFT:
 				isWaiting = false;
-				transform.position = convertToVector3(nextPosition);
+				transform.parent.position = convertToVector3(nextPosition);
 				nextPosition.x++;
 				spriteAnim.refreshPosition(LOOK.LEFT);
 				break;
 			case MOVE.RIGHT:
 				isWaiting = false;
-				transform.position = convertToVector3(nextPosition);
+				transform.parent.position = convertToVector3(nextPosition);
 				nextPosition.x--;
 				spriteAnim.refreshPosition(LOOK.RIGHT);
 				break;
 			case MOVE.UP:
 				isWaiting = false;
-				transform.position = convertToVector3(nextPosition);
+				transform.parent.position = convertToVector3(nextPosition);
 				nextPosition.y++;
 				spriteAnim.refreshPosition(LOOK.UP);
 				break;
 			case MOVE.DOWN:
 				isWaiting = false;
-				transform.position = convertToVector3(nextPosition);
+				transform.parent.position = convertToVector3(nextPosition);
 				nextPosition.y--;
 				spriteAnim.refreshPosition(LOOK.DOWN);
 				break;
@@ -172,7 +182,7 @@ public class Enemy : MonoBehaviour{
 				break;
 		}
 		
-		oldDistance = Vector3.Distance(transform.position, convertToVector3(nextPosition));
+		oldDistance = Vector3.Distance(transform.parent.position, convertToVector3(nextPosition));
 	}
 	
 	Vector3 convertToVector3(Vector2 pos)
@@ -181,6 +191,23 @@ public class Enemy : MonoBehaviour{
 		poolVector3.y = 2.225f;
 		poolVector3.z = pos.x*2f;
 		return poolVector3;
+	}
+	
+	public Vector3 lookToVector()
+	{
+		switch(spriteAnim.getActualLook())
+		{
+		case LOOK.DOWN:
+			return (-transform.parent.forward - transform.parent.right).normalized;
+		case LOOK.LEFT:
+			return (transform.parent.forward - transform.parent.right).normalized;
+		case LOOK.UP:
+			return (transform.parent.forward + transform.parent.right).normalized;
+		case LOOK.RIGHT:
+			return (-transform.parent.forward + transform.parent.right).normalized;
+		default:
+			return Vector3.zero;
+		}
 	}
 	
 	#region EDITOR
@@ -321,19 +348,44 @@ public class Enemy : MonoBehaviour{
 	public void testEnemy()
 	{
 		isInEditor = false;
+		go ();
 		startAction();
 	}
 	
 	public void endTestEnemy()
 	{
 		isInEditor = true;
-		transform.position = convertToVector3(startPosition);
+		transform.parent.position = convertToVector3(startPosition);
 		nextPosition = startPosition;
 		spriteAnim.refreshPosition(defaultLookAt);
 		stateIndex = 0;
 		timeForAction = 0f;
 		isWaiting = false;
 	}
+	
+	public SerializableEnemy saveEnemy()
+	{
+		return new SerializableEnemy((int) startPosition.x, (int) startPosition.y, moveList, defaultLookAt);	
+	}
+	
+	public void loadEnemy(SerializableEnemy se, bool inEditorLoad = true)
+	{
+		startPosition.x = se.startX;
+		startPosition.y = se.startY;
+		nextPosition = startPosition;
+		if(inEditorLoad)
+		{
+			moveList = new List<EnemyAction>();
+			isInEditor = true;
+		}
+		else{
+			moveList = se.ea;
+			isInEditor = false;
+		}
+		defaultLookAt = se.defaultLook;
+		spriteAnim = new AnimationSprite(GetComponent<UISprite>(), "", defaultLookAt);
+	}
 	#endregion
+	
 	
 }

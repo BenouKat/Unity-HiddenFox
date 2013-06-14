@@ -1,6 +1,9 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
+[System.Serializable]
 public enum BLOCSTATE{
 	EMPTY,
 	CUBE,
@@ -16,13 +19,31 @@ public class LevelEditor{
 	
 	public Vector2 startPlayerPosition;
 	
-	public bool playerPositionSet;
-	
 	public LevelEditor(int maxWidth, int maxHeight, int maxVolume)
 	{
-		startPlayerPosition = new Vector2(0f,0f);
+		startPlayerPosition = new Vector2(0f, 0f);
 		levelState = new BLOCSTATE[maxWidth,maxHeight,maxVolume];
 		gameObjectList = new GameObject[maxWidth, maxHeight, maxVolume];
+	}
+	
+	public void purge(int maxWidth, int maxHeight, int maxVolume)
+	{
+		for(int i=0; i<maxWidth; i++)
+		{
+			for(int j=0; j<maxHeight; j++)
+			{
+				for(int h=0; h<maxVolume; h++)
+				{
+					if(levelState[i,j,h] == BLOCSTATE.CUBE || levelState[i,j,h] == BLOCSTATE.ENEMYSTART)
+					{
+						GameObject.Destroy(gameObjectList[i,j,h]);
+						gameObjectList[i,j,h] = null;
+					}
+					levelState[i,j,h] = BLOCSTATE.EMPTY;
+				}
+			}
+		}
+		startPlayerPosition = new Vector2(0f, 0f);
 	}
 	
 	public void setCube(int w, int h, int v, GameObject go)
@@ -88,7 +109,6 @@ public class LevelEditor{
 	{
 		levelState[width, height, 1] = BLOCSTATE.PLAYERSTART;
 		startPlayerPosition = new Vector2((float)width, (float)height);
-		playerPositionSet = true;
 	}
 	
 	public void setStartEnemyPosition(int width, int height, GameObject go)
@@ -100,7 +120,6 @@ public class LevelEditor{
 	public void removePlayerPosition()
 	{
 		levelState[(int)startPlayerPosition.x,(int)startPlayerPosition.y,1] = BLOCSTATE.EMPTY;
-		playerPositionSet = false;
 	}
 	
 	public void removeEnemyPosition(int width, int height)
@@ -108,5 +127,27 @@ public class LevelEditor{
 		levelState[width, height, 1] = BLOCSTATE.EMPTY;
 		GameObject.Destroy(gameObjectList[width, height, 1]);
 		gameObjectList[width, height, 1] = null;
+	}
+	
+	
+	public Level saveLevel(string name, string ID, List<Enemy> listEnemy)
+	{
+		var listSE = new List<SerializableEnemy>();
+		for(int i=0; i<listEnemy.Count; i++)
+		{
+			listSE.Add(listEnemy.ElementAt(i).saveEnemy());	
+		}
+		return new Level(name, ID, levelState, listSE, (int)startPlayerPosition.x, (int) startPlayerPosition.y);
+	}
+	
+	public void loadLevel(Level l)
+	{
+		levelState = l.getLevelState();
+		startPlayerPosition = l.getPlayerSpawn();
+	}
+	
+	public BLOCSTATE[,,] getEntireBlocState()
+	{
+		return levelState;
 	}
 }

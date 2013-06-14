@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
+[System.Serializable]
 public enum MOVE{
 	LEFT,
 	RIGHT,
@@ -10,12 +11,10 @@ public enum MOVE{
 	LOOKLEFT,
 	LOOKRIGHT,
 	LOOKUP,
-	LOOKDOWN,
-	POWER1,
-	POWER2,
-	POWER3
+	LOOKDOWN
 }
 
+[System.Serializable]
 public class EnemyAction{
 	
 	

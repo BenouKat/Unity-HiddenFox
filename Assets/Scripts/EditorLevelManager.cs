@@ -2,13 +2,20 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
+using System.Reflection;
 
 public enum EDITMODE{
 	CUBE,
 	STARTPOSITION,
 	ENEMY,
 	EDITENEMY,
-	TESTENEMY
+	TESTENEMY,
+	SAVELEVEL,
+	LOADLEVEL
 }
 
 public enum TURN{
@@ -59,7 +66,14 @@ public class EditorLevelManager : MonoBehaviour {
 	private GameObject cursorWayValid;
 	private GameObject cursorWayAction;
 	
+	//UI edit enemy
 	public GameObject panelUIEdit;
+	
+	//UI load file
+	public GameObject panelUILoad;
+	
+	//UI save file
+	public GameObject panelUISave;
 	
 	private Dictionary<Enemy, List<GameObject>> listUIEnemy;
 	
@@ -107,20 +121,20 @@ public class EditorLevelManager : MonoBehaviour {
 	private int actualActionSelected;
 	private bool inEnemyTest;
 	
+	//List des levels disponibles
+	private List<string> listLevelSaved;
+	private int actualFileSelected;
+	
 	//Mode de construction
 	private EDITMODE actualMode;
 	
 	private bool isInHidingMode;
-	
-	//Camera Contener en mode game
-	private GameObject cameraContener;
 	
 	// Use this for initialization
 	void Start () {
 		
 		isInHidingMode = false;
 		inEnemyTest = false;
-		cameraContener = Camera.main.transform.parent.gameObject;
 		actualMode = EDITMODE.CUBE;
 		placementCube = cursor.transform.FindChild("PlacementCube").gameObject;
 		deleteCube = cursor.transform.FindChild("DeleteCube").gameObject;
@@ -132,10 +146,11 @@ public class EditorLevelManager : MonoBehaviour {
 		cursorWayValid = cursorEdit.transform.FindChild("WayEditValid").gameObject;
 		cursorWayAction = cursorEdit.transform.FindChild("ActionEdit").gameObject;
 		listUIEnemy = new Dictionary<Enemy, List<GameObject>>();
-		
+		listLevelSaved = new List<string>();
 		
 		actualSizeSelected = 0;
 		actualActionSelected = (int)MOVE.WAIT;
+		actualFileSelected = 0;
 		
 		actualLevel = new LevelEditor(maxWidth, maxHeight, maxVolume);
 		
@@ -170,15 +185,21 @@ public class EditorLevelManager : MonoBehaviour {
 			case EDITMODE.TESTENEMY:
 				UpdateCamera();
 				break;
+			case EDITMODE.LOADLEVEL:
+				UpdateSaveLoad();
+				break;
+			case EDITMODE.SAVELEVEL:
+				UpdateSaveLoad();
+				break;
 		}
 		
 		//Debug inputs
-		if(Input.GetKeyDown(KeyCode.O) && actualMode == EDITMODE.CUBE)
+		if(Input.GetKeyDown(KeyCode.O) && actualMode == EDITMODE.CUBE) //SPAWN
 		{
 			goOnSpawnPlayerMode();	
 		}
 		
-		if(Input.GetKeyDown(KeyCode.U) && actualMode == EDITMODE.CUBE)
+		if(Input.GetKeyDown(KeyCode.U) && actualMode == EDITMODE.CUBE) //ENEMY PUT
 		{
 			goOnSpawnEnemy();
 		}
@@ -195,9 +216,9 @@ public class EditorLevelManager : MonoBehaviour {
 			}
 		}
 		
+		//TEST
 		if(Input.GetKeyDown(KeyCode.T) && ((actualMode == EDITMODE.EDITENEMY && actualEnemyEdit.isValidEnemy(actualLevel)) || (actualMode == EDITMODE.TESTENEMY)))
 		{
-			Debug.Log("Enemy valid");
 			if(!inEnemyTest)
 			{
 				inEnemyTest = true;
@@ -220,6 +241,30 @@ public class EditorLevelManager : MonoBehaviour {
 				enableEnemyWay(actualEnemyEdit);
 				oldWidthSelected = -1;
 				oldHeightSelected = -1;
+			}
+		}
+		
+		//SAVE
+		if(Input.GetKeyDown(KeyCode.S) && actualMode == EDITMODE.CUBE)
+		{
+			goOnSaveLevel();	
+		}else if(Input.GetKeyDown(KeyCode.Return) && actualMode == EDITMODE.SAVELEVEL)
+		{
+			if(!String.IsNullOrEmpty(panelUISave.transform.FindChild("Input").GetComponent<UIInput>().text))
+			{
+				saveLevel();
+			}
+		}
+		
+		//LOAD
+		if(Input.GetKeyDown(KeyCode.L) && actualMode == EDITMODE.CUBE)
+		{
+			goOnLoadLevel();
+		}else if(Input.GetKeyDown(KeyCode.Return) && actualMode == EDITMODE.LOADLEVEL)
+		{
+			if(panelUILoad.transform.FindChild("LabelFile").GetComponent<UILabel>().text != "EMPTY")
+			{
+				loadLevel();
 			}
 		}
 		
@@ -342,7 +387,7 @@ public class EditorLevelManager : MonoBehaviour {
 						playerSpawnInvalid.SetActive(false);
 						break;
 					case BLOCSTATE.ENEMYSTART:
-						removeEnemyObject(actualLevel.getGameObjectAt(gridWidthSelected, gridHeightSelected, 1).GetComponent<Enemy>());
+						removeEnemyObject(actualLevel.getGameObjectAt(gridWidthSelected, gridHeightSelected, 1).transform.GetChild(0).GetComponent<Enemy>());
 						actualLevel.removeEnemyPosition(gridWidthSelected, gridHeightSelected);
 						break;
 				}
@@ -494,9 +539,10 @@ public class EditorLevelManager : MonoBehaviour {
 				var go = (GameObject)Instantiate(enemyModel, new Vector3(actualHeightSelected, actualSizeSelected*2 + 0.225f, actualWidthSelected), enemyModel.transform.rotation);
 				actualLevel.setStartEnemyPosition(gridWidthSelected, gridHeightSelected, go);
 				go.transform.parent = panelEnemy.transform;
+				go.transform.localScale = new Vector3(1f, 1f, 1f);
 				go.SetActive(true);
-				go.GetComponent<Enemy>().init (enemyLook, new Vector2((float)gridWidthSelected, (float)gridHeightSelected));
-				listUIEnemy.Add(go.GetComponent<Enemy>(), new List<GameObject>());
+				go.transform.GetChild(0).GetComponent<Enemy>().init (enemyLook, new Vector2((float)gridWidthSelected, (float)gridHeightSelected));
+				listUIEnemy.Add(go.transform.GetChild(0).GetComponent<Enemy>(), new List<GameObject>());
 				enemyValid.SetActive(false);
 				actualMode = EDITMODE.CUBE;
 				oldWidthSelected = -1;
@@ -504,7 +550,7 @@ public class EditorLevelManager : MonoBehaviour {
 			}else if(enemyHover.activeSelf)
 			{
 				enemyHover.SetActive(false);
-				actualEnemyEdit = actualLevel.getGameObjectAt(gridWidthSelected, gridHeightSelected, 1).GetComponent<Enemy>();
+				actualEnemyEdit = actualLevel.getGameObjectAt(gridWidthSelected, gridHeightSelected, 1).transform.GetChild(0).GetComponent<Enemy>();
 				lastEnemyEditPosition = actualEnemyEdit.getLastPosition();
 				refreshPossiblePositionAction();
 				panelUIEdit.SetActive(true);
@@ -527,6 +573,10 @@ public class EditorLevelManager : MonoBehaviour {
 				oldWidthSelected = -1;
 				oldHeightSelected = -1;
 			
+		}
+		if(Input.GetKeyDown(KeyCode.Escape))
+		{
+			 quitSpawnEnemy();	
 		}
 		
 		UpdateCamera();
@@ -641,18 +691,23 @@ public class EditorLevelManager : MonoBehaviour {
 		
 		if(Input.GetKeyDown(KeyCode.Escape))
 		{
-			disableEnemyWay(actualEnemyEdit);	
-		 	cursorWayValid.SetActive(false);
-			cursorWayAction.SetActive(false);
-			possibleActionObject.SetActive(false);
-			panelUIEdit.SetActive(false);
-			actualMode = EDITMODE.CUBE;
-			oldWidthSelected = -1;
-			oldHeightSelected = -1;
+			quitEditEnemy();
 		}
 		#endregion
 		
 		UpdateCamera();
+	}
+	
+	void UpdateSaveLoad()
+	{
+		if(Input.GetKeyDown(KeyCode.Escape))
+		{
+			panelUILoad.SetActive(false);
+			panelUISave.SetActive(false);
+			actualMode = EDITMODE.CUBE;
+			oldWidthSelected = -1;
+			oldHeightSelected = -1;
+		}
 	}
 	
 	#region Position
@@ -678,7 +733,7 @@ public class EditorLevelManager : MonoBehaviour {
 	#region Camera
 	void UpdateCamera()
 	{
-		UpdateCameraInEditor();
+		//UpdateCameraInEditor();
 	}
 	
 	void UpdateCameraInEditor()
@@ -698,19 +753,6 @@ public class EditorLevelManager : MonoBehaviour {
 		if(Input.GetKey(KeyCode.DownArrow))
 		{
 			Camera.main.transform.Translate(0f, -speedCameraMove*Time.deltaTime, 0f);
-		}
-	}
-	
-	void UpdateCameraInGame()
-	{
-		if(Input.GetKey(KeyCode.UpArrow)){
-			cameraContener.transform.Translate(speedCameraMove*Time.deltaTime, 0f , 0f);
-		}else if(Input.GetKey(KeyCode.DownArrow)){
-			cameraContener.transform.Translate(-speedCameraMove*Time.deltaTime, 0f, 0f);
-		}else if(Input.GetKey(KeyCode.RightArrow)){
-			cameraContener.transform.Translate(0f, 0f, -speedCameraMove*Time.deltaTime);
-		}else if(Input.GetKey(KeyCode.LeftArrow)){
-			cameraContener.transform.Translate(0f, 0f, speedCameraMove*Time.deltaTime);
 		}
 	}
 	#endregion
@@ -781,9 +823,85 @@ public class EditorLevelManager : MonoBehaviour {
 		oldWidthSelected = -1;
 		oldHeightSelected = -1;
 	}
+	
+	public void goOnLoadLevel()
+	{
+		if(placementCube.activeSelf)
+		{
+			placementCube.SetActive(false);
+		}else
+		if(deleteCube.activeSelf)
+		{
+			deleteCube.SetActive(false);	
+		}
+		if(previousBlocSelected != null)
+		{
+			previousBlocSelected.renderer.enabled = appearCubeCondition();
+			previousBlocSelected = null;
+		}
+		oldWidthSelected = -1;
+		oldHeightSelected = -1;
+		actualMode = EDITMODE.LOADLEVEL;
+		
+		foreach(var file in Directory.GetFiles(Application.dataPath + "/Levels/"))
+		{
+			if(file.Contains(".lvl") && !file.Contains(".meta"))
+			{
+				listLevelSaved.Add(file.Replace('\\', '/').Split('/').Last());
+			}
+		}
+		actualFileSelected = 0;
+		refreshTextLoad();
+		
+		panelUILoad.SetActive(true);
+	}
+	
+	public void goOnSaveLevel()
+	{
+		if(placementCube.activeSelf)
+		{
+			placementCube.SetActive(false);
+		}else
+		if(deleteCube.activeSelf)
+		{
+			deleteCube.SetActive(false);	
+		}
+		if(previousBlocSelected != null)
+		{
+			previousBlocSelected.renderer.enabled = appearCubeCondition();
+			previousBlocSelected = null;
+		}
+		oldWidthSelected = -1;
+		oldHeightSelected = -1;
+		actualMode = EDITMODE.SAVELEVEL;
+		
+		panelUISave.SetActive(true);
+	}
+	
+	public void quitSpawnEnemy()
+	{
+		enemyValid.SetActive(false);
+		enemyHover.SetActive(false);
+		enemyInvalid.SetActive(false);
+		actualMode = EDITMODE.CUBE;
+		oldWidthSelected = -1;
+		oldHeightSelected = -1;
+	}
+	
+	public void quitEditEnemy()
+	{
+		disableEnemyWay(actualEnemyEdit);	
+	 	cursorWayValid.SetActive(false);
+		cursorWayAction.SetActive(false);
+		possibleActionObject.SetActive(false);
+		panelUIEdit.SetActive(false);
+		actualMode = EDITMODE.CUBE;
+		oldWidthSelected = -1;
+		oldHeightSelected = -1;
+	}
 	#endregion
 	
-	
+	#region EDITCUBE
 	bool appearCubeCondition()
 	{
 		return !isInHidingMode || (oldSizeSelected <= actualSizeSelected);
@@ -800,7 +918,9 @@ public class EditorLevelManager : MonoBehaviour {
 		actualLevel.setDisplayUpperBlocs(true, maxWidth, maxHeight, maxVolume, actualSizeSelected);
 		isInHidingMode = false;
 	}
+	#endregion
 	
+	#region EDITENEMY
 	public void refreshPossiblePositionAction()
 	{
 		possibleActionObject.SetActive(true);
@@ -826,11 +946,11 @@ public class EditorLevelManager : MonoBehaviour {
 		{
 			right.SetActive(false);	
 		}
-		if(y + 1 < maxHeight && (actualLevel.getBlocState(x,y-1,1) == BLOCSTATE.CUBE || actualLevel.getBlocState(x, y-1, 0) == BLOCSTATE.EMPTY))
+		if(y - 1 > 0 && (actualLevel.getBlocState(x,y-1,1) == BLOCSTATE.CUBE || actualLevel.getBlocState(x, y-1, 0) == BLOCSTATE.EMPTY))
 		{
 			down.SetActive(false);	
 		}
-		if(y - 1 > 0 && (actualLevel.getBlocState(x,y+1,1) == BLOCSTATE.CUBE || actualLevel.getBlocState(x, y+1, 0) == BLOCSTATE.EMPTY))
+		if(y + 1 < maxHeight && (actualLevel.getBlocState(x,y+1,1) == BLOCSTATE.CUBE || actualLevel.getBlocState(x, y+1, 0) == BLOCSTATE.EMPTY))
 		{
 			up.SetActive(false);	
 		}
@@ -902,9 +1022,33 @@ public class EditorLevelManager : MonoBehaviour {
 		}
 	}
 	
+	public void placeUIWay(MOVE action)
+	{
+		var theTurn = actualEnemyEdit.isMakingATurn();
+		if(action == MOVE.LEFT){
+			addGameObjectToList(lineObject, -90f, actualEnemyEdit.getLastPosition());	
+		}else if(action == MOVE.RIGHT){
+			addGameObjectToList(lineObject, 90f, actualEnemyEdit.getLastPosition());	
+		}else if(action == MOVE.UP){
+			addGameObjectToList(lineObject, 0f, actualEnemyEdit.getLastPosition());	
+		}else if(action == MOVE.DOWN){
+			addGameObjectToList(lineObject, 180f, actualEnemyEdit.getLastPosition());	
+		}
+		
+		if(theTurn != TURN.NONE)
+		{
+			replaceTurnObject(theTurn);	
+		}
+	}
+	
 	public void placeUIAction()
 	{
 		addGameObjectToList(actionObject, 0f);	
+	}
+	
+	public void placeUIAction(Vector2 position)
+	{
+		addGameObjectToList(actionObject, 0f, position);	
 	}
 	
 	public void replaceTurnObject(TURN t)
@@ -950,11 +1094,20 @@ public class EditorLevelManager : MonoBehaviour {
 		listUIEnemy[actualEnemyEdit].Add(go);	
 	}
 	
+	public void addGameObjectToList(GameObject model, float rotation, Vector2 position) 
+	{
+		var go = (GameObject)Instantiate(model, new Vector3(position.y*2f, 2f, position.x*2f), cursorEdit.transform.rotation);
+		go.transform.Rotate(0f, rotation, 0f);
+		if(model.name == "ActionObject") go.name = "Action";
+		colorAllChild(go, actualNumberAction);
+		listUIEnemy[actualEnemyEdit].Add(go);	
+	}
+	
 	public void insertGameObjectToList(GameObject model, float rotation, int positionToInsert, Vector3 oldPosition)
 	{
 		var go = (GameObject)Instantiate(model, oldPosition, cursorEdit.transform.rotation);
 		go.transform.Rotate(0f, rotation, 0f);
-		go.SetActive(true);
+		go.SetActive(actualMode == EDITMODE.EDITENEMY);
 		colorAllChild(go, actualNumberAction - 1);
 		listUIEnemy[actualEnemyEdit].Insert(positionToInsert, go);	
 	}
@@ -1071,12 +1224,6 @@ public class EditorLevelManager : MonoBehaviour {
 			return "Look Left";
 		case MOVE.LOOKDOWN:
 			return "Look Down";
-		case MOVE.POWER1:
-			return "Laser Look";
-		case MOVE.POWER2:
-			return "Zone Look";
-		case MOVE.POWER3:
-			return "Grenade Look";
 		}
 		return "error";
 	}
@@ -1090,7 +1237,7 @@ public class EditorLevelManager : MonoBehaviour {
 	public void nextEnemeyAction()
 	{
 		actualActionSelected++;
-		if(actualActionSelected > (int)MOVE.POWER3)
+		if(actualActionSelected > (int)MOVE.LOOKDOWN)
 		{
 			actualActionSelected = (int)MOVE.WAIT;	
 		}
@@ -1102,9 +1249,166 @@ public class EditorLevelManager : MonoBehaviour {
 		actualActionSelected--;
 		if(actualActionSelected < (int)MOVE.WAIT)
 		{
-			actualActionSelected = (int)MOVE.POWER3;	
+			actualActionSelected = (int)MOVE.LOOKDOWN;	
 		}
 		refreshText(new EnemyAction((MOVE)actualActionSelected, 3f));
 	}
+	#endregion
+	
+	#region EDITSAVELOAD
+	public void nextFile()
+	{
+		actualFileSelected++;
+		if(actualFileSelected >= listLevelSaved.Count)
+		{
+			actualFileSelected = 0;	
+		}
+		refreshTextLoad();
+	}
+	
+	public void prevFile()
+	{
+		actualFileSelected--;
+		if(actualFileSelected < 0)
+		{
+			actualFileSelected = listLevelSaved.Count > 0 ? listLevelSaved.Count - 1 : 0;	
+		}
+		refreshTextLoad();
+	}
+	
+	public void refreshTextLoad()
+	{
+		if(listLevelSaved.Any())
+		{
+			panelUILoad.transform.FindChild("LabelFile").GetComponent<UILabel>().text = listLevelSaved.ElementAt(actualFileSelected);
+		}else{
+			panelUILoad.transform.FindChild("LabelFile").GetComponent<UILabel>().text = "EMPTY";
+		}
+	}
+	
+	public void saveLevel()
+	{
+		var ID = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + 
+			DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + 
+				DateTime.Now.Millisecond.ToString();	
+		
+		var name = panelUISave.transform.FindChild("Input").GetComponent<UIInput>().text;
+		
+		var listEnemy = new List<Enemy>();
+		for(int i=0; i<listUIEnemy.Count; i++)
+		{
+			listEnemy.Add(listUIEnemy.ElementAt(i).Key);	
+		}
+		var levelToSerialize = actualLevel.saveLevel(name, ID, listEnemy);
+		
+		if(File.Exists(Application.dataPath + "/Levels/" + name + ".lvl"))
+		{
+			if(File.Exists(Application.dataPath + "/Levels/" + name + ".bak"))
+			{
+				File.Delete(Application.dataPath + "/Levels/" + name + ".bak");
+			}
+			File.Move(Application.dataPath + "/Levels/" + name + ".lvl", Application.dataPath + "/Levels/" + name + ".bak");
+		}
+		
+		Stream stream = File.Open(Application.dataPath + "/Levels/" + name + ".lvl", FileMode.Create);
+		BinaryFormatter bformatter = new BinaryFormatter();
+		bformatter.Binder = new VersionDeserializationBinder();
+		
+		try{
+			bformatter.Serialize(stream, levelToSerialize);
+			stream.Close();
+		}catch(Exception e){
+			stream.Close();
+			Debug.Log(e.Message);
+		}
+		
+		panelUISave.SetActive(false);
+		actualMode = EDITMODE.CUBE;
+		oldWidthSelected = -1;
+		oldHeightSelected = -1;
+	}
+	
+	public void loadLevel()
+	{
+		Stream stream = File.Open(Application.dataPath + "/Levels/" + panelUILoad.transform.FindChild("LabelFile").GetComponent<UILabel>().text, FileMode.Open);
+		BinaryFormatter bformatter = new BinaryFormatter();
+		bformatter.Binder = new VersionDeserializationBinder();
+		Level l = (Level)bformatter.Deserialize(stream);
+		stream.Close();
+		
+		
+		//purge
+		actualLevel.purge(maxWidth, maxHeight, maxVolume);
+		for(int i=0; i<listUIEnemy.Count; i++)
+		{
+			for(int j=0; j<listUIEnemy.ElementAt(i).Value.Count; j++)
+			{
+				Destroy(listUIEnemy.ElementAt(i).Value.ElementAt(j));
+			}
+		}
+		listUIEnemy.Clear();
+		
+		//load
+		actualLevel.loadLevel(l);
+		
+		//Recreate the world
+		var theLevelState = actualLevel.getEntireBlocState();
+		for(int i=0; i<maxWidth; i++)
+		{
+			for(int j=0; j<maxHeight; j++)
+			{
+				for(int h=0; h<maxVolume; h++)
+				{
+					if(theLevelState[i,j,h] == BLOCSTATE.CUBE)
+					{
+						var go = (GameObject)Instantiate(h == 0 ? cubeBase : cubeBloc, new Vector3(j*2, h*2, i*2), cubeBase.transform.rotation);
+						actualLevel.setCube(i, j, h, go);
+						go.SetActive(true);
+					}
+				}
+			}
+		}
+		actualLevel.setStartPlayerPosition((int)l.getPlayerSpawn().x, (int)l.getPlayerSpawn().y);
+		playerSpawnValid.SetActive(true);
+		playerSpawn.transform.position = new Vector3(l.getPlayerSpawn().y*2f, 2f, l.getPlayerSpawn().x*2f);
+		
+		
+		//Recréation de la liste d'ennemy
+		listUIEnemy = new Dictionary<Enemy, List<GameObject>>();
+		for(int i=0; i<l.getEnemies().Count; i++)
+		{
+			var enemy = l.getEnemies().ElementAt(i);
+			var go = (GameObject)Instantiate(enemyModel, new Vector3(enemy.startY*2, 2.225f, enemy.startX*2), enemyModel.transform.rotation);
+			actualLevel.setStartEnemyPosition(enemy.startX, enemy.startY, go);
+			go.transform.parent = panelEnemy.transform;
+			go.transform.localScale = new Vector3(1f, 1f, 1f);
+			go.SetActive(true);
+			go.transform.GetChild(0).GetComponent<Enemy>().loadEnemy(enemy);
+			listUIEnemy.Add(go.transform.GetChild(0).GetComponent<Enemy>(), new List<GameObject>());
+			actualEnemyEdit = go.transform.GetChild(0).GetComponent<Enemy>();
+			for(int j=0; j<enemy.ea.Count; j++)
+			{
+				bool isDeplacement = ((int)actualEnemyEdit.getLastAction() <= 3);
+				actualEnemyEdit.addAction(enemy.ea.ElementAt(j).state, enemy.ea.ElementAt(j).timeWait);
+				if((int)enemy.ea.ElementAt(j).state <= 3)
+				{
+					actualNumberAction = actualEnemyEdit.getNumberOfAction();
+					placeUIWay(enemy.ea.ElementAt(j).state);
+				}else{
+					if(isDeplacement)
+					{
+						placeUIAction(actualEnemyEdit.getLastPosition());
+					}
+				}
+				listUIEnemy[actualEnemyEdit].Last().SetActive(false);
+			}
+		}
+		
+		panelUILoad.SetActive(false);
+		actualMode = EDITMODE.CUBE;
+		oldWidthSelected = -1;
+		oldHeightSelected = -1;
+	}
+	#endregion
 }
 				 
