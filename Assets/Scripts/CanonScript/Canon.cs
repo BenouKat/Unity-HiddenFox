@@ -14,6 +14,8 @@ public class Canon : MonoBehaviour {
 	
 	private Vector3 bulletPositionBase;
 	
+	private LOOK startLOOK;
+	
 	
 	public float maxSpeedRotate;
 	private float speedRotate;
@@ -24,6 +26,8 @@ public class Canon : MonoBehaviour {
 	
 	private bool bulletShot;
 	private bool prepareBullet;
+	
+	public bool activeCanon;
 	// Use this for initialization
 	void Start () {
 		cercle = transform.FindChild("WholeCanon").FindChild("Cercle").gameObject;
@@ -38,20 +42,29 @@ public class Canon : MonoBehaviour {
 		
 		bulletShot = false;
 		prepareBullet = false;
-		StartCoroutine(Canon_Coroutine());
+		if(activeCanon) StartCoroutine(Canon_Coroutine());
 		
 	}
 	
 	void Update()
 	{
-		cercle.transform.Rotate(new Vector3(speedRotate*Time.deltaTime, 0f, 0f));
-		
-		if(prepareBullet && speedBullet < maxSpeedRotate)
+		if(activeCanon)
 		{
-			speedRotate += speedUpRotate*Time.deltaTime;
-		}else if(!prepareBullet && speedRotate > 0f){
-			speedRotate -= speedDownRotate*Time.deltaTime;	
+			cercle.transform.Rotate(new Vector3(speedRotate*Time.deltaTime, 0f, 0f));
+			
+			if(prepareBullet && speedBullet < maxSpeedRotate)
+			{
+				speedRotate += speedUpRotate*Time.deltaTime;
+			}else if(!prepareBullet && speedRotate > 0f){
+				speedRotate -= speedDownRotate*Time.deltaTime;	
+			}
 		}
+	}
+	
+	public void activeTheCanon()
+	{
+		activeCanon = true;
+		StartCoroutine(Canon_Coroutine());
 	}
 	
 	public void reloadBullet()
@@ -66,6 +79,16 @@ public class Canon : MonoBehaviour {
 	
 	public void stopBullet(){
 		bulletShot = false;	
+	}
+	
+	public void setLook(LOOK l)
+	{
+		startLOOK = l;	
+	}
+	
+	public LOOK getLook()
+	{
+		return startLOOK;	
 	}
 	
 	IEnumerator Canon_Coroutine()

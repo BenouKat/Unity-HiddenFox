@@ -55,7 +55,7 @@ public class Bullet : MonoBehaviour {
 	{
 		if(c.transform.name.Contains("Player"))
 		{
-			Debug.Log("Game over");	
+			//Trouvé
 		}
 		time = 0f;
 		isDestroyed = true;
