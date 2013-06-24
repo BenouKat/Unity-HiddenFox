@@ -7,6 +7,7 @@ using System.Linq;
 public enum BLOCSTATE{
 	EMPTY,
 	CUBE,
+	WALL,
 	PLAYERSTART,
 	PLAYERFINISH,
 	CANON,
