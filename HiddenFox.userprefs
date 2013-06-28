@@ -1,18 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GeneralScript\Enemy.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\DeadScript\HelicoDeadPlayer.cs">
     <Files>
-      <File FileName="Assets\Scripts\GeneralScript\Level.cs" Line="29" Column="28" />
-      <File FileName="Assets\Scripts\CanonScript\Canon.cs" Line="84" Column="2" />
-      <File FileName="Assets\Scripts\CameraScript\CameraEnemy.cs" Line="18" Column="25" />
-      <File FileName="Assets\Scripts\CanonScript\Bullet.cs" Line="50" Column="23" />
-      <File FileName="Assets\Scripts\GeneralScript\Enemy.cs" Line="423" Column="14" />
-      <File FileName="Assets\Scripts\GeneralScript\EnemyDetection.cs" Line="22" Column="12" />
-      <File FileName="Assets\Scripts\EditorScript\EditorLevelManager.cs" Line="2182" Column="45" />
-      <File FileName="Assets\Scripts\EditorScript\LevelEditor.cs" Line="216" Column="122" />
-      <File FileName="Assets\Scripts\EditorScript\SerializableEnemy.cs" Line="13" Column="24" />
-      <File FileName="Assets\Scripts\EditorScript\SerializableObject.cs" Line="21" Column="20" />
-      <File FileName="Assets\Scripts\HelicoScript\HelicoDetection.cs" Line="10" Column="12" />
+      <File FileName="Assets\Scripts\GeneralScript\Gameplay.cs" Line="229" Column="116" />
+      <File FileName="Assets\Scripts\CameraScript\CameraEnemy.cs" Line="110" Column="40" />
+      <File FileName="Assets\Scripts\GeneralScript\Player.cs" Line="84" Column="56" />
+      <File FileName="Assets\Scripts\GeneralScript\Level.cs" Line="10" Column="1" />
+      <File FileName="Assets\Scripts\DeadScript\HelicoDeadPlayer.cs" Line="9" Column="3" />
+      <File FileName="Assets\Scripts\HelicoScript\HelicoDetection.cs" Line="18" Column="4" />
+      <File FileName="Assets\Scripts\GeneralScript\Enemy.cs" Line="78" Column="20" />
+      <File FileName="Assets\Scripts\CanonScript\Bullet.cs" Line="63" Column="32" />
+      <File FileName="Assets\Scripts\CanonScript\Canon.cs" Line="118" Column="3" />
+      <File FileName="Assets\Scripts\InternEngine\ParticuleManager.cs" Line="15" Column="32" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

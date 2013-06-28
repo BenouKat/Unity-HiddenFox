@@ -33,7 +33,6 @@ public class Enemy : MonoBehaviour{
 	
 	private Vector3 poolVector3;
 	
-	private bool isInEditor;
 	private bool isGameStarted;
 	
 	public LOOK defaultLookAt;
@@ -63,19 +62,39 @@ public class Enemy : MonoBehaviour{
 		nextPosition = startPosition;
 		defaultLookAt = defaultLook;
 		turnEnemy(defaultLookAt, true);
-		isInEditor = editorMode;
 		isHelicopter = tisHelicopter;
+	}
+	
+	
+	public void reset()
+	{
+		transform.collider.enabled = false;
+		isGameStarted = false;
+		stateIndex = 0;
+		timeForAction = 0f;
+		isWaiting = false;
+		animPlayed = false;
+		animPlayedBack = false;
+		if(!isHelicopter)
+		{
+			animation.Stop("AnimEnemyBack");
+			animation.Stop("AnimEnemy");
+		}
+		transform.position = convertToVector3(startPosition);	
+		nextPosition = startPosition;
+		turnEnemy(defaultLookAt, true);
 	}
 	
 	public void go()
 	{
 		isGameStarted = true;
 		transform.collider.enabled = true;
+		startAction();
 	}
 	
 	void Update()
 	{
-		if(!isInEditor || isGameStarted)
+		if(isGameStarted)
 		{
 			UpdateAction();
 		}
@@ -393,21 +412,13 @@ public class Enemy : MonoBehaviour{
 	
 	public void testEnemy()
 	{
-		isInEditor = false;
 		go ();
-		startAction();
 	}
 	
 	public void endTestEnemy()
 	{
-		isInEditor = true;
 		isGameStarted = false;
-		if(!isHelicopter)
-		{
-			transform.parent.position = convertToVector3(startPosition);
-		}else{
-			transform.position = convertToVector3(startPosition);	
-		}
+		transform.position = convertToVector3(startPosition);
 		nextPosition = startPosition;
 		turnEnemy(defaultLookAt, true);
 		stateIndex = 0;
@@ -428,11 +439,9 @@ public class Enemy : MonoBehaviour{
 		if(inEditorLoad)
 		{
 			moveList = new List<EnemyAction>();
-			isInEditor = true;
 		}
 		else{
 			moveList = se.ea;
-			isInEditor = false;
 		}
 		defaultLookAt = se.defaultLook;
 		isHelicopter = se.isHelicopter;

@@ -133,6 +133,7 @@
      <Compile Include="Assets\Scripts\CameraScript\CameraEnemy.cs" />
      <Compile Include="Assets\Scripts\CanonScript\Bullet.cs" />
      <Compile Include="Assets\Scripts\CanonScript\Canon.cs" />
+     <Compile Include="Assets\Scripts\DeadScript\HelicoDeadPlayer.cs" />
      <Compile Include="Assets\Scripts\EditorScript\EditorLevelManager.cs" />
      <Compile Include="Assets\Scripts\EditorScript\EnemyAction.cs" />
      <Compile Include="Assets\Scripts\EditorScript\EventButtonEditor.cs" />
@@ -140,12 +141,18 @@
      <Compile Include="Assets\Scripts\EditorScript\SerializableEnemy.cs" />
      <Compile Include="Assets\Scripts\EditorScript\SerializableObject.cs" />
      <Compile Include="Assets\Scripts\EditorScript\VersionDeserializationBinder.cs" />
+     <Compile Include="Assets\Scripts\GeneralScript\DynamicLoader.cs" />
      <Compile Include="Assets\Scripts\GeneralScript\Enemy.cs" />
      <Compile Include="Assets\Scripts\GeneralScript\EnemyDetection.cs" />
+     <Compile Include="Assets\Scripts\GeneralScript\FinishDetection.cs" />
      <Compile Include="Assets\Scripts\GeneralScript\Gameplay.cs" />
      <Compile Include="Assets\Scripts\GeneralScript\Level.cs" />
      <Compile Include="Assets\Scripts\GeneralScript\Player.cs" />
+     <Compile Include="Assets\Scripts\GeneralScript\UIManager.cs" />
      <Compile Include="Assets\Scripts\HelicoScript\HelicoDetection.cs" />
+     <Compile Include="Assets\Scripts\InternEngine\BDDLevelTime.cs" />
+     <Compile Include="Assets\Scripts\InternEngine\ParticuleManager.cs" />
+     <Compile Include="Assets\Scripts\InternEngine\UserSave.cs" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Depth Cutout.shader" />
      <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
      <None Include="Assets\Standard Assets\Glass Refraction (Pro Only)\Sources\Shaders\Glass-Stained-BumpDistort.shader" />

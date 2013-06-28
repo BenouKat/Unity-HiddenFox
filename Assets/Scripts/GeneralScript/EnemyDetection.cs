@@ -10,16 +10,19 @@ public class EnemyDetection : MonoBehaviour {
 	public float viewAngle;
 	public float distanceMax;
 	
+	private Gameplay gameplay;
+	
 	void Awake(){
 		enemyAssociated = transform.GetComponent<Enemy>();
 		capteur = new Ray(Vector3.zero, Vector3.zero);
+		if(!Application.loadedLevelName.Contains("Editor")) gameplay = GameObject.Find("Engine").GetComponent<Gameplay>();
 	}
 	
 	void OnTriggerStay(Collider c)
 	{
 		if(Vector3.Distance(transform.position, c.transform.position) <= distanceMax)
 		{
-			//Trouvé
+			gameplay.isDiscovered();
 		}
 		else if(Vector3.Angle(enemyAssociated.lookToVector(), (c.transform.position - transform.position).normalized) <= viewAngle){
 			capteur.origin = transform.position;
@@ -29,7 +32,7 @@ public class EnemyDetection : MonoBehaviour {
 			{
 				if(info.transform.name.Contains("Player"))
 				{
-					//Trouvé
+					gameplay.isDiscovered();
 				}
 			}
 		}

@@ -78,4 +78,9 @@ public class Player : MonoBehaviour {
 		
 		cameraPlayer.transform.position = Vector3.SmoothDamp(cameraPlayer.transform.position, transform.position, ref velocity, 0.1f);
 	}
+	
+	public void centerCamera()
+	{
+		cameraPlayer.transform.position = transform.position;
+	}
 }

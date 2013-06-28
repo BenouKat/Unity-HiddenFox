@@ -6,7 +6,6 @@ using System.Collections;
 public class Canon : MonoBehaviour {
 	
 	private GameObject cercle;
-	public Material materialTige;
 	private GameObject bullet;
 	private ParticleSystem chargementCanon;
 	private ParticleSystem explosionCanon;
@@ -27,7 +26,7 @@ public class Canon : MonoBehaviour {
 	private bool bulletShot;
 	private bool prepareBullet;
 	
-	public bool activeCanon;
+	private bool activeCanon;
 	// Use this for initialization
 	void Start () {
 		cercle = transform.FindChild("WholeCanon").FindChild("Cercle").gameObject;
@@ -39,10 +38,9 @@ public class Canon : MonoBehaviour {
 		chargementCanon.gameObject.SetActive(false);
 		explosionCanon.gameObject.SetActive(false);
 		bullet.SetActive(false);
-		
+		speedRotate = 0f;
 		bulletShot = false;
 		prepareBullet = false;
-		if(activeCanon) StartCoroutine(Canon_Coroutine());
 		
 	}
 	
@@ -61,10 +59,35 @@ public class Canon : MonoBehaviour {
 		}
 	}
 	
-	public void activeTheCanon()
+	public void reset()
+	{
+		activeCanon = false;
+		StopCoroutine("Canon_Coroutine");
+		speedRotate = 0f;
+		switch(startLOOK)
+		{
+		case LOOK.DOWN:
+			transform.eulerAngles = new Vector3(0f, 0f, 0f);
+			break;
+		case LOOK.UP:
+			transform.eulerAngles = new Vector3(0f, 180f, 0f);
+			break;
+		case LOOK.RIGHT:
+			transform.eulerAngles = new Vector3(0f, -90f, 0f);
+			break;
+		case LOOK.LEFT:
+			transform.eulerAngles = new Vector3(0f, 90f, 0f);
+			break;
+		}
+		stopBullet();
+		reloadBullet();
+		prepareBullet = false;
+	}
+	
+	public void go()
 	{
 		activeCanon = true;
-		StartCoroutine(Canon_Coroutine());
+		StartCoroutine("Canon_Coroutine");
 	}
 	
 	public void reloadBullet()

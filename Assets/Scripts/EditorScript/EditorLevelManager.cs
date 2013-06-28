@@ -2205,7 +2205,7 @@ public class EditorLevelManager : MonoBehaviour {
 			var theObj = l.getObjects().ElementAt(i);
 			if(theObj.isCanon)
 			{
-				var go = (GameObject)Instantiate(canonModel, new Vector3(theObj.positionX*2f, 2.2f, theObj.positionY*2f), canonModel.transform.rotation);
+				var go = (GameObject)Instantiate(canonModel, new Vector3(theObj.positionY*2f, 2.2f, theObj.positionX*2f), canonModel.transform.rotation);
 				actualLevel.setCanon((int)theObj.positionX, (int)theObj.positionY, go);
 				go.SetActive(true);
 				go.GetComponent<Canon>().setLook((LOOK)theObj.theLook);
@@ -2225,7 +2225,7 @@ public class EditorLevelManager : MonoBehaviour {
 					break;
 				}
 			}else{
-				var go = (GameObject)Instantiate(cameraEnModel, new Vector3(theObj.positionX*2f, 4f, theObj.positionY*2f), cameraEnModel.transform.rotation);
+				var go = (GameObject)Instantiate(cameraEnModel, new Vector3(theObj.positionY*2f, 4f, theObj.positionX*2f), cameraEnModel.transform.rotation);
 				actualLevel.setCameraEnemy((int)theObj.positionX, (int)theObj.positionY, go);
 				go.GetComponent<CameraEnemy>().rightFirst = theObj.isRightFirst;
 				go.SetActive(true);
@@ -2233,16 +2233,16 @@ public class EditorLevelManager : MonoBehaviour {
 				switch(theObj.theLook)
 				{
 				case LOOK.DOWN:
-					go.transform.eulerAngles = new Vector3(0f, 0f, 0f);
+					go.transform.eulerAngles = new Vector3(0f, 90f, 0f);
 					break;
 				case LOOK.UP:
-					go.transform.eulerAngles = new Vector3(0f, 180f, 0f);
-					break;
-				case LOOK.RIGHT:
 					go.transform.eulerAngles = new Vector3(0f, -90f, 0f);
 					break;
+				case LOOK.RIGHT:
+					go.transform.eulerAngles = new Vector3(0f, 0f, 0f);
+					break;
 				case LOOK.LEFT:
-					go.transform.eulerAngles = new Vector3(0f, 90f, 0f);
+					go.transform.eulerAngles = new Vector3(0f, 180f, 0f);
 					break;
 				}
 			}

@@ -13,17 +13,18 @@ public class CameraEnemy : MonoBehaviour {
 	
 	private float rotationChecked;
 	
-	public bool activeCamera;
-	
 	private LOOK startLOOK;
+	
+	private Gameplay gameplay;
+	private GameObject PSDetection;
 	
 	// Use this for initialization
 	void Start () {
-	
 		capteur = new Ray(Vector3.zero, Vector3.zero);
 		positionDecal = new Vector3(transform.position.x, transform.position.y - 2f, transform.position.z);
 		rotationChecked = 0f;
-		if(activeCamera) StartCoroutine(Camera_Coroutine());
+		if(!Application.loadedLevelName.Contains("Editor")) gameplay = GameObject.Find("Engine").GetComponent<Gameplay>();
+		PSDetection = transform.FindChild("PSDetection").gameObject;
 	}
 	
 	// Update is called once per frame
@@ -31,10 +32,30 @@ public class CameraEnemy : MonoBehaviour {
 		
 	}
 	
-	public void activate()
+	public void go()
 	{
-		activeCamera = true;
-		StartCoroutine(Camera_Coroutine());
+		StartCoroutine("Camera_Coroutine");
+	}
+	
+	public void reset()
+	{
+		StopCoroutine("Camera_Coroutine");
+		rotationChecked = 0f;
+		switch(startLOOK)
+		{
+			case LOOK.DOWN:
+				transform.eulerAngles = new Vector3(0f, 90f, 0f);
+				break;
+			case LOOK.UP:
+				transform.eulerAngles = new Vector3(0f, -90f, 0f);
+				break;
+			case LOOK.RIGHT:
+				transform.eulerAngles = new Vector3(0f, 0f, 0f);
+				break;
+			case LOOK.LEFT:
+				transform.eulerAngles = new Vector3(0f, 180f, 0f);
+				break;	
+		}
 	}
 	
 	public void setLook(LOOK l)
@@ -86,7 +107,8 @@ public class CameraEnemy : MonoBehaviour {
 			{
 				if(info.transform.name.Contains("Player"))
 				{
-					//Trouvé
+					StopCoroutine("Camera_Coroutine");
+					gameplay.isDiscovered(PSDetection, "Camera");
 				}
 			}
 		}
