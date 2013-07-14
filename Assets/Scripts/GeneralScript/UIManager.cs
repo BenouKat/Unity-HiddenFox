@@ -47,6 +47,7 @@ public class UIManager : MonoBehaviour {
 	public List<UILabel> infoMedal;
 	public List<Color> colorButeeMedal;
 	public UILabel retry;
+	public GameObject manaBar;
 	
 	public float speedFade;
 	
@@ -240,6 +241,7 @@ public class UIManager : MonoBehaviour {
 	{
 		resetState(UISTATE.CLEAR);
 		
+		manaBar.SetActive(false);
 		
 		bandeau[(int)UISTATE.CLEAR].gameObject.SetActive(true);
 		labelSprite[(int)UISTATE.CLEAR].gameObject.SetActive(true);

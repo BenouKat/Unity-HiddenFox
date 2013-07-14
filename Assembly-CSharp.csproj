@@ -147,6 +147,7 @@
      <Compile Include="Assets\Scripts\GeneralScript\FinishDetection.cs" />
      <Compile Include="Assets\Scripts\GeneralScript\Gameplay.cs" />
      <Compile Include="Assets\Scripts\GeneralScript\Level.cs" />
+     <Compile Include="Assets\Scripts\GeneralScript\ManaBar.cs" />
      <Compile Include="Assets\Scripts\GeneralScript\Player.cs" />
      <Compile Include="Assets\Scripts\GeneralScript\UIManager.cs" />
      <Compile Include="Assets\Scripts\HelicoScript\HelicoDetection.cs" />

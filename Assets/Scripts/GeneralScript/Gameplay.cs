@@ -25,6 +25,11 @@ public class Gameplay : MonoBehaviour {
 	
 	private bool gameOver;
 	private bool clear;
+	
+	private GameObject tempGOstorage;
+	private GameObject tempPlayerDeadStorage;
+	public float forcePlayerDead;
+	public float forceTorquePlayerDead;
 	// Use this for initialization
 	void Start () {
 		dl = GetComponent<DynamicLoader>();
@@ -53,7 +58,7 @@ public class Gameplay : MonoBehaviour {
 		
 		if(gameOver)
 		{
-			if(time >= 0.2f)
+			if(time >= 1f)
 			{
 				if(thePlayer.activeSelf) thePlayer.SetActive(false);	
 				if(Input.GetKeyDown(KeyCode.R))
@@ -91,7 +96,7 @@ public class Gameplay : MonoBehaviour {
 		gameOver = false;
 		time = 0f;
 		dl.resetTheLevel();
-		thePlayer.GetComponent<Player>().centerCamera();
+		thePlayer.GetComponent<Player>().resetPlayer();
 		thePlayer.SetActive(false);
 		desactiveAllDeathPlayer();
 		for(int i=0; i<playerDeath.transform.childCount; i++)
@@ -116,7 +121,7 @@ public class Gameplay : MonoBehaviour {
 		{
 			gameOver = true;
 			if(particuleDetection != null) particuleDetection.SetActive(true);
-			activeSpecialTrigger(enemyType);
+			activeSpecialTrigger(enemyType, particuleDetection);
 			time = 0f;
 			uim.launchState(UISTATE.SPOT);
 		}
@@ -196,15 +201,23 @@ public class Gameplay : MonoBehaviour {
 		playerDeath.transform.FindChild("Canon").FindChild("Explosion").particleSystem.Stop(true);
 		playerDeath.transform.FindChild("Helicopter").FindChild("PlayerDead").transform.localPosition = new Vector3(0f, 1.68f, 0f);
 		playerDeath.transform.FindChild("Helicopter").FindChild("PlayerDead").transform.eulerAngles = new Vector3(0f, 0f, 0f);
+		playerDeath.transform.FindChild("Enemy").FindChild("Explosion").particleSystem.Clear(true);
+		playerDeath.transform.FindChild("Enemy").FindChild("Explosion").particleSystem.Stop(true);
+		if(tempPlayerDeadStorage != null)
+		{
+			Destroy(tempPlayerDeadStorage);
+			tempPlayerDeadStorage = null;
+		}
 	}
 	
-	public void activeSpecialTrigger(string enemyType)
+	public void activeSpecialTrigger(string enemyType, GameObject ps)
 	{
 		switch(enemyType)
 		{
 		case "Camera":
 			playerDeath.transform.FindChild(enemyType).gameObject.SetActive(true);
-			Invoke("callPlayerDeathCamera", 0.2f);
+			playerDeath.transform.position = new Vector3(thePlayer.transform.position.x, 0f, thePlayer.transform.position.z);	
+			thePlayer.SetActive(false);
 			break;
 		case "Canon":
 			thePlayer.SetActive(false);
@@ -215,12 +228,11 @@ public class Gameplay : MonoBehaviour {
 		case "Helicopter":
 			Invoke("callPlayerDeathHelico", 0.2f);
 			break;
+		case "Enemy":
+			tempGOstorage = ps;
+			Invoke("callPlayerDeathEnemy", 0.2f);
+			break;
 		}
-	}
-	
-	public void callPlayerDeathCamera()
-	{
-		playerDeath.transform.position = new Vector3(thePlayer.transform.position.x, 0f, thePlayer.transform.position.z);	
 	}
 	
 	public void callPlayerDeathHelico()
@@ -229,5 +241,22 @@ public class Gameplay : MonoBehaviour {
 		playerDeath.transform.position = new Vector3(thePlayer.transform.position.x, 0f, thePlayer.transform.position.z);
 		playerDeath.transform.rotation = thePlayer.transform.rotation;	
 		playerDeath.transform.FindChild("Helicopter").gameObject.SetActive(true);
+	}
+	
+	public void callPlayerDeathEnemy()
+	{
+		thePlayer.SetActive(false);
+		playerDeath.transform.position = new Vector3(thePlayer.transform.position.x, 0f, thePlayer.transform.position.z);
+		playerDeath.transform.rotation = thePlayer.transform.rotation;	
+		playerDeath.transform.FindChild("Enemy").gameObject.SetActive(true);
+		var model = playerDeath.transform.FindChild("Enemy").FindChild("PlayerDead").gameObject;
+		GameObject thePlayerDeath = (GameObject) Instantiate(model, model.transform.position, model.transform.rotation);
+		thePlayerDeath.SetActive(true);
+		for(int i=0; i<thePlayerDeath.transform.childCount; i++)
+		{
+			thePlayerDeath.transform.GetChild(i).rigidbody.AddForce((thePlayerDeath.transform.position - tempGOstorage.transform.position).normalized*forcePlayerDead);
+			thePlayerDeath.transform.GetChild(i).rigidbody.AddTorque(new Vector3(Random.Range(0f, 1f)*forceTorquePlayerDead, Random.Range(0f, 1f)*forceTorquePlayerDead, Random.Range(0f, 1f)*forceTorquePlayerDead));
+		}
+		tempPlayerDeadStorage = thePlayerDeath;
 	}
 }

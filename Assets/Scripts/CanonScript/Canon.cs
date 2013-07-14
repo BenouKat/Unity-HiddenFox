@@ -140,32 +140,6 @@ public class Canon : MonoBehaviour {
 			}
 			
 			yield return new WaitForSeconds(3f);
-			
-			while(transform.position.y > 1.8f){
-				transform.Translate(new Vector3(0f, -speedTranslationRotation*Time.deltaTime, 0f));
-				
-				yield return 0;
-			}
-			transform.position = new Vector3(transform.position.x, 1.8f, transform.position.z);
-			
-			baseCanon.SetActive(false);
-			
-			var makeTurn = 0f;
-			while(makeTurn < 90f)
-			{
-				makeTurn += 90f*speedTranslationRotation*Time.deltaTime;
-				
-				transform.Rotate(0f, 90f*speedTranslationRotation*Time.deltaTime - (makeTurn > 90f ? makeTurn - 90f : 0f), 0f);
-				yield return 0;
-			}
-			
-			baseCanon.SetActive(true);
-			
-			while(transform.position.y < 2.2f){
-				transform.Translate(new Vector3(0f, speedTranslationRotation*Time.deltaTime, 0f));
-				yield return 0;
-			}
-			transform.position = new Vector3(transform.position.x, 2.2f, transform.position.z);
 		}
 	}
 }

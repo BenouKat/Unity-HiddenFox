@@ -5,6 +5,7 @@ public class Bullet : MonoBehaviour {
 	
 	private Canon theCanon;
 	private Light pointLight;
+	private LensFlare lensFlare;
 	private ParticleSystem ps;
 	
 	private bool isDestroyed;
@@ -18,6 +19,7 @@ public class Bullet : MonoBehaviour {
 	void Start () {
 		theCanon = transform.parent.GetComponent<Canon>();
 		pointLight = transform.FindChild("Light").light;
+		lensFlare = transform.GetComponentInChildren<LensFlare>();
 		ps = transform.FindChild("PS").particleSystem;
 		time = 0f;
 		if(!Application.loadedLevelName.Contains("Editor")) gameplay = GameObject.Find("Engine").GetComponent<Gameplay>();
@@ -32,6 +34,10 @@ public class Bullet : MonoBehaviour {
 			if(pointLight.intensity > 0)
 			{
 				pointLight.intensity -= 1f*Time.deltaTime;
+			}
+			if(lensFlare.brightness > 0)
+			{
+				lensFlare.brightness -= 0.8f*Time.deltaTime;
 			}
 			time += Time.deltaTime;
 			if(time > timeDeath)
@@ -52,6 +58,7 @@ public class Bullet : MonoBehaviour {
 	{
 		time = 0f;
 		pointLight.intensity = 2f;
+		lensFlare.brightness = 0.8f;
 		isDestroyed = false;
 		transform.collider.enabled = true;
 	}

@@ -77,8 +77,14 @@ public class Enemy : MonoBehaviour{
 		animPlayedBack = false;
 		if(!isHelicopter)
 		{
+			GetComponent<EnemyDetection>().reset ();
 			animation.Stop("AnimEnemyBack");
 			animation.Stop("AnimEnemy");
+			animation.Stop("AnimEnemySpot");
+			transform.FindChild("Corps").rotation = Quaternion.identity;
+			transform.FindChild("PivotBras").rotation = Quaternion.identity;
+			transform.FindChild("PivotBras").FindChild("BrasGauche").rotation = Quaternion.identity;
+			transform.FindChild("PivotBras").FindChild("BrasGauche").localPosition = new Vector3(-transform.FindChild("PivotBras").FindChild("BrasDroite").localPosition.x, 0f, 0f);
 		}
 		transform.position = convertToVector3(startPosition);	
 		nextPosition = startPosition;
@@ -90,6 +96,12 @@ public class Enemy : MonoBehaviour{
 		isGameStarted = true;
 		transform.collider.enabled = true;
 		startAction();
+	}
+	
+	public void pause()
+	{
+		isGameStarted = false;
+		transform.collider.enabled = false;
 	}
 	
 	void Update()

@@ -76,6 +76,7 @@ public class CombineChildren : MonoBehaviour {
 				go.transform.localScale = Vector3.one;
 				go.transform.localRotation = Quaternion.identity;
 				go.transform.localPosition = Vector3.zero;
+				go.layer = gameObject.layer;
 				go.AddComponent(typeof(MeshFilter));
 				go.AddComponent("MeshRenderer");
 				go.renderer.material = (Material)de.Key;

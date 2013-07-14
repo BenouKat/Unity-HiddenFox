@@ -24,6 +24,10 @@ public class DynamicLoader : MonoBehaviour {
 	private List<CameraEnemy> cameraList;
 	private List<Canon> canonList;
 	
+	public GameObject cubeBaseContainer;
+	public GameObject cubeBlocContainer;
+	
+	
 	private Vector3 playerStart;
 	
 	public int maxWidth;
@@ -156,6 +160,12 @@ public class DynamicLoader : MonoBehaviour {
 					{
 						var go = (GameObject)Instantiate(h == 0 ? cubeBase : cubeBloc, new Vector3(j*2, h*2, i*2), cubeBase.transform.rotation);
 						go.SetActive(true);
+						if(h==0)
+						{
+							go.transform.parent = cubeBaseContainer.transform;
+						}else{
+							go.transform.parent = cubeBlocContainer.transform;
+						}
 					}else if(levelState[i,j,h] == BLOCSTATE.WALL){
 						var wall = (GameObject)Instantiate(cubeWall, new Vector3(j*2, h*2, i*2), cubeWall.transform.rotation);
 						wall.SetActive(true);
@@ -169,6 +179,9 @@ public class DynamicLoader : MonoBehaviour {
 			var go = (GameObject)Instantiate(cubeWall, new Vector3(listCubeWall.ElementAt(i).y*2f, 2f, listCubeWall.ElementAt(i).x*2f), cubeWall.transform.rotation);
 			go.SetActive(true);
 		}
+		
+		//StaticBatchingUtility.Combine(cubeBaseContainer);
+		//StaticBatchingUtility.Combine(cubeBlocContainer);
 		
 		player.transform.position = new Vector3(l.getPlayerSpawn().y*2f, 1.68f, l.getPlayerSpawn().x*2f);
 		playerStart = player.transform.position;
