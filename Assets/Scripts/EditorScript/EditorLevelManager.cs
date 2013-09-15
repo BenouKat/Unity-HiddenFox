@@ -10,6 +10,7 @@ using System.Reflection;
 
 public enum EDITMODE{
 	CUBE,
+	SPECIAL,
 	STARTPOSITION,
 	FINISHPOSITION,
 	ENEMY,
@@ -43,6 +44,8 @@ public class EditorLevelManager : MonoBehaviour {
 	public GameObject cubeBase;
 	//Cube du niveau autre
 	public GameObject cubeBloc;
+	//Special
+	public GameObject special;
 	//Collider Raycast
 	public GameObject rayCastCollider;
 	//Curseur
@@ -50,6 +53,12 @@ public class EditorLevelManager : MonoBehaviour {
 	//Element du curseur
 	private GameObject placementCube;
 	private GameObject deleteCube;
+	
+	//Curseur
+	public GameObject cursorSpecial;
+	//Element du special
+	private GameObject placementSpecial;
+	private GameObject deleteSpecial;
 	
 	//Modele Enemy
 	public GameObject enemyModel;
@@ -175,6 +184,8 @@ public class EditorLevelManager : MonoBehaviour {
 		actualMode = EDITMODE.CUBE;
 		placementCube = cursor.transform.FindChild("PlacementCube").gameObject;
 		deleteCube = cursor.transform.FindChild("DeleteCube").gameObject;
+		placementSpecial = cursorSpecial.transform.FindChild("PlacementSpecial").gameObject;
+		deleteSpecial = cursorSpecial.transform.FindChild("DeleteSpecial").gameObject;
 		playerSpawnValid = playerSpawn.transform.FindChild("SpawnValid").gameObject;
 		playerSpawnInvalid = playerSpawn.transform.FindChild("SpawnInvalid").gameObject;
 		playerFinishValid = playerFinish.transform.FindChild("FinishValid").gameObject;
@@ -220,6 +231,9 @@ public class EditorLevelManager : MonoBehaviour {
 			case EDITMODE.CUBE:
 				UpdateCube();
 				break;
+			case EDITMODE.SPECIAL:
+				UpdateSpecial();
+				break;
 			case EDITMODE.STARTPOSITION:
 				UpdateStartPosition();
 				break;
@@ -256,6 +270,11 @@ public class EditorLevelManager : MonoBehaviour {
 		}
 		
 		//Debug inputs
+		if(Input.GetKeyDown(KeyCode.X) && actualMode == EDITMODE.CUBE) //SPAWN
+		{
+			goOnSpecialMode();	
+		}
+		
 		if(Input.GetKeyDown(KeyCode.I) && actualMode == EDITMODE.CUBE) //SPAWN
 		{
 			goOnSpawnPlayerMode();	
@@ -405,7 +424,18 @@ public class EditorLevelManager : MonoBehaviour {
 					placementCube.SetActive(false);
 					break;
 					
-				case BLOCSTATE.PLAYERSTART: //Case du respawn
+				case BLOCSTATE.SPECIAL: //Case special
+					if(previousBlocSelected != null)
+					{
+						previousBlocSelected.renderer.enabled = appearCubeCondition();
+					}
+					previousBlocSelected = actualLevel.getGameObjectAt(gridWidthSelected, gridHeightSelected, actualSizeSelected);
+					previousBlocSelected.renderer.enabled = false;
+					deleteCube.SetActive(true);
+					placementCube.SetActive(false);
+					break;
+					
+				case BLOCSTATE.PLAYERSTART: //Case spawn
 					if(previousBlocSelected != null)
 					{
 						previousBlocSelected.renderer.enabled = appearCubeCondition();
@@ -502,6 +532,9 @@ public class EditorLevelManager : MonoBehaviour {
 					case BLOCSTATE.CUBE:
 						actualLevel.removeCube(gridWidthSelected, gridHeightSelected, actualSizeSelected);
 						break;
+					case BLOCSTATE.SPECIAL:
+						actualLevel.removeSpecial(gridWidthSelected, gridHeightSelected, actualSizeSelected);
+						break;
 					case BLOCSTATE.PLAYERSTART:
 						actualLevel.removePlayerPosition();
 						playerSpawnValid.SetActive(false);
@@ -553,6 +586,91 @@ public class EditorLevelManager : MonoBehaviour {
 			oldHeightSelected = -1;
 		}
 		
+		
+		UpdateCamera();
+		
+	}
+	#endregion
+	
+	#region Special
+	void UpdateSpecial () {
+	
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit hit;
+		
+		if(Physics.Raycast(ray, out hit)){
+			//Detection de la position curseur
+			UpdatePositionMouse(hit);
+			
+			//Verification de la nouvelle position
+			if(actualWidthSelected != oldWidthSelected || actualHeightSelected != oldHeightSelected)
+			{
+				oldWidthSelected = actualWidthSelected;
+				oldHeightSelected = actualHeightSelected;
+				gridWidthSelected = (int)actualWidthSelected/2;
+				gridHeightSelected = (int)actualHeightSelected/2;
+			
+				//Actualisation
+				cursorSpecial.transform.position = new Vector3(actualHeightSelected, actualSizeSelected*2, actualWidthSelected);
+				
+				//Activation des curseur
+				var blocStateStage = actualLevel.getBlocState(gridWidthSelected, gridHeightSelected, actualSizeSelected);
+				if(blocStateStage == BLOCSTATE.EMPTY)
+				{
+					placementSpecial.SetActive(true);
+					deleteSpecial.SetActive(false);
+				}else{
+					deleteSpecial.SetActive(true);
+					placementSpecial.SetActive(false);
+				}
+			}
+			
+		}else{
+			deleteSpecial.SetActive(false);
+			placementSpecial.SetActive(false);
+		}
+		
+		//Clic souris
+		if(Input.GetMouseButton(0) && placementSpecial.activeSelf)
+		{
+			var go = (GameObject)Instantiate(special, new Vector3(actualHeightSelected, actualSizeSelected*2, actualWidthSelected), special.transform.rotation);
+			go.SetActive(true);
+			actualLevel.setSpecial(gridWidthSelected, gridHeightSelected, actualSizeSelected, go);
+			actualMode = EDITMODE.CUBE;
+			oldWidthSelected = -1;
+			oldHeightSelected = -1;
+			deleteSpecial.SetActive(false);
+			placementSpecial.SetActive(false);
+			
+		}
+		
+		if(Input.GetMouseButton(1) && deleteCube.activeSelf)
+		{
+			actualLevel.removeSpecial(gridWidthSelected, gridHeightSelected, actualSizeSelected);
+			oldWidthSelected = -1;
+			oldHeightSelected = -1;
+			
+		}
+		
+		if((Input.GetAxis("Mouse ScrollWheel") > 0 || Input.GetKeyDown(KeyCode.P)) && actualSizeSelected < maxVolume - 1){
+			actualSizeSelected++;
+			if(isInHidingMode)
+			{
+				actualLevel.setDisplayThisLevel(true, maxWidth, maxHeight, actualSizeSelected);
+			}
+			rayCastCollider.transform.Translate(0f, 2f, 0f);
+			oldWidthSelected = -1;
+			oldHeightSelected = -1;
+		}else if((Input.GetAxis("Mouse ScrollWheel") < 0 || Input.GetKeyDown(KeyCode.M)) && actualSizeSelected > 0){
+			if(isInHidingMode)
+			{
+				actualLevel.setDisplayThisLevel(false, maxWidth, maxHeight, actualSizeSelected);
+			}
+			actualSizeSelected--;
+			rayCastCollider.transform.Translate(0f, -2f, 0f);
+			oldWidthSelected = -1;
+			oldHeightSelected = -1;
+		}
 		
 		UpdateCamera();
 		
@@ -1379,6 +1497,36 @@ public class EditorLevelManager : MonoBehaviour {
 	
 	
 	#region TriggerMode
+	public void goOnSpecialMode()
+	{
+		//Desactivation du curseur
+		if(placementCube.activeSelf)
+		{
+			placementCube.SetActive(false);
+		}else
+		if(deleteCube.activeSelf)
+		{
+			deleteCube.SetActive(false);	
+		}
+		if(previousBlocSelected != null)
+		{
+			previousBlocSelected.renderer.enabled = appearCubeCondition();
+			previousBlocSelected = null;
+		}
+		oldWidthSelected = -1;
+		oldHeightSelected = -1;
+		//Remove old position
+		actualMode = EDITMODE.SPECIAL;
+		actualLevel.setDisplayThisLevel(true, maxWidth, maxHeight, actualSizeSelected);
+		if(isInHidingMode)
+		{
+			actualLevel.setDisplayUpperBlocs(false, maxWidth, maxHeight, maxVolume, actualSizeSelected);
+		}
+		oldWidthSelected = -1;
+		oldHeightSelected = -1;
+	}
+	
+	
 	public void goOnSpawnPlayerMode()
 	{
 		//Desactivation du curseur
@@ -2155,6 +2303,13 @@ public class EditorLevelManager : MonoBehaviour {
 					{
 						var go = (GameObject)Instantiate(h == 0 ? cubeBase : cubeBloc, new Vector3(j*2, h*2, i*2), cubeBase.transform.rotation);
 						actualLevel.setCube(i, j, h, go);
+						go.SetActive(true);
+					}
+					
+					if(theLevelState[i,j,h] == BLOCSTATE.SPECIAL)
+					{
+						var go = (GameObject)Instantiate(special, new Vector3(j*2, h*2, i*2), special.transform.rotation);
+						actualLevel.setSpecial(i, j, h, go);
 						go.SetActive(true);
 					}
 				}

@@ -9,7 +9,6 @@ public class Canon : MonoBehaviour {
 	private GameObject bullet;
 	private ParticleSystem chargementCanon;
 	private ParticleSystem explosionCanon;
-	private GameObject baseCanon;
 	
 	private Vector3 bulletPositionBase;
 	
@@ -33,7 +32,6 @@ public class Canon : MonoBehaviour {
 		chargementCanon = transform.FindChild("WholeCanon").FindChild("ChargementCanon").particleSystem;
 		explosionCanon = transform.FindChild("WholeCanon").FindChild("ExplosionCanon").particleSystem;
 		bullet = transform.FindChild("Bullet").gameObject;
-		baseCanon = transform.Find("Base").gameObject;
 		bulletPositionBase = bullet.transform.localPosition;
 		chargementCanon.gameObject.SetActive(false);
 		explosionCanon.gameObject.SetActive(false);

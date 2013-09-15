@@ -8,6 +8,7 @@ public enum BLOCSTATE{
 	EMPTY,
 	CUBE,
 	WALL,
+	SPECIAL,
 	PLAYERSTART,
 	PLAYERFINISH,
 	CANON,
@@ -64,6 +65,12 @@ public class LevelEditor{
 		gameObjectList[w,h,v] = go;
 	}
 	
+	public void setSpecial(int w, int h, int v, GameObject go)
+	{
+		levelState[w,h,v] = BLOCSTATE.SPECIAL;
+		gameObjectList[w,h,v] = go;
+	}
+	
 	
 	public void setCanon(int w, int h, GameObject go)
 	{
@@ -81,6 +88,13 @@ public class LevelEditor{
 	
 	
 	public void removeCube(int w, int h, int v)
+	{
+		levelState[w,h,v] = BLOCSTATE.EMPTY;
+		GameObject.Destroy(gameObjectList[w,h,v]);
+		gameObjectList[w,h,v] = null;
+	}
+	
+	public void removeSpecial(int w, int h, int v)
 	{
 		levelState[w,h,v] = BLOCSTATE.EMPTY;
 		GameObject.Destroy(gameObjectList[w,h,v]);
@@ -110,7 +124,7 @@ public class LevelEditor{
 			{
 				for(int h=actualVolume+1; h<maxVolume; h++)
 				{
-					if(getBlocState(i,j,h) == BLOCSTATE.CUBE)
+					if(getBlocState(i,j,h) == BLOCSTATE.CUBE || getBlocState(i,j,h) == BLOCSTATE.SPECIAL)
 					{
 						gameObjectList[i,j,h].renderer.enabled = show;
 					}
@@ -125,7 +139,7 @@ public class LevelEditor{
 		{
 			for(int j=0; j<maxHeight; j++)
 			{
-				if(getBlocState(i,j,actualVolume) == BLOCSTATE.CUBE)
+				if(getBlocState(i,j,actualVolume) == BLOCSTATE.CUBE || getBlocState(i,j,actualVolume) == BLOCSTATE.SPECIAL)
 				{
 					gameObjectList[i,j,actualVolume].renderer.enabled = show;
 				}

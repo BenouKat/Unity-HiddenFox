@@ -10,15 +10,18 @@ using System.Reflection;
 
 public class DynamicLoader : MonoBehaviour {
 	
+	public GameObject cubeFloor;
 	public GameObject cubeBase;
 	public GameObject cubeBloc;
 	public GameObject cubeWall;
+	public GameObject special;
 	public GameObject player;
 	public GameObject enemyWalk;
 	public GameObject canon;
 	public GameObject cameraEnemy;
 	public GameObject helicopter;
 	public GameObject playerFinish;
+	public bool addRandomFloor = true;
 	
 	private List<Enemy> enemyList;
 	private List<CameraEnemy> cameraList;
@@ -26,7 +29,7 @@ public class DynamicLoader : MonoBehaviour {
 	
 	public GameObject cubeBaseContainer;
 	public GameObject cubeBlocContainer;
-	
+	public GameObject cubeFloorContainer;
 	
 	private Vector3 playerStart;
 	
@@ -39,7 +42,7 @@ public class DynamicLoader : MonoBehaviour {
 		enemyList = new List<Enemy>();
 		cameraList = new List<CameraEnemy>();
 		canonList = new List<Canon>();
-		BDDLevelTime.Inst.actualLevel = "LevelTest"; //TEMPO
+		BDDLevelTime.Inst.actualLevel = "MainMenuLevel"; //TEMPO
 		loadLevel(BDDLevelTime.Inst.actualLevel);
 	}
 	
@@ -166,9 +169,30 @@ public class DynamicLoader : MonoBehaviour {
 						}else{
 							go.transform.parent = cubeBlocContainer.transform;
 						}
+						
+						//Random floor
+						if(h == 0 && addRandomFloor)
+						{
+							var randomValue = UnityEngine.Random.Range(0, 5);
+							for(int r=0; r < randomValue; r++)
+							{
+								if(r != 0)
+								{
+									var fl = (GameObject)Instantiate(cubeFloor, new Vector3(j*2, -r*2, i*2), cubeFloor.transform.rotation);
+									fl.SetActive(true);
+									fl.transform.parent = cubeFloorContainer.transform;
+								}
+								
+								
+							}
+						}
 					}else if(levelState[i,j,h] == BLOCSTATE.WALL){
 						var wall = (GameObject)Instantiate(cubeWall, new Vector3(j*2, h*2, i*2), cubeWall.transform.rotation);
 						wall.SetActive(true);
+					}
+					else if(levelState[i,j,h] == BLOCSTATE.SPECIAL){
+						var specialObj = (GameObject)Instantiate(special, new Vector3(j*2, h*2, i*2), special.transform.rotation);
+						specialObj.SetActive(true);
 					}
 				}
 			}
