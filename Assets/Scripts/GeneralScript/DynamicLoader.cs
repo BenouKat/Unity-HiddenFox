@@ -42,7 +42,7 @@ public class DynamicLoader : MonoBehaviour {
 		enemyList = new List<Enemy>();
 		cameraList = new List<CameraEnemy>();
 		canonList = new List<Canon>();
-		BDDLevelTime.Inst.actualLevel = "MainMenuLevel"; //TEMPO
+		BDDLevelTime.Inst.actualLevel = "LevelTest"; //TEMPO
 		loadLevel(BDDLevelTime.Inst.actualLevel);
 	}
 	

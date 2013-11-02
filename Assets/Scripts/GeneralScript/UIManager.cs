@@ -18,7 +18,6 @@ public class UIManager : MonoBehaviour {
 
 	
 	public UILabel timeDisplayed;
-	public UILabel timeText;
 	private float timeContener;
 	
 	private Vector3[] posbandeauBase;
@@ -118,7 +117,6 @@ public class UIManager : MonoBehaviour {
 			}
 			resetLabelColor(retry);
 			resetMedalsPosition();
-			timeText.color = new Color(0.83f, 0f, 0f, 1f);
 			timeDisplayed.color = new Color(0.72f, 1f, 1f, 1f);
 			break;
 		}
@@ -277,9 +275,8 @@ public class UIManager : MonoBehaviour {
 	{
 		panelFinish.gameObject.SetActive(true);
 		var theTime = 0f;
-		while(timeText.color.a > 0)
+		while(timeDisplayed.color.a > 0)
 		{
-			timeText.color = Color.Lerp(timeText.color, new Color(0.8f, 0f, 0f, 0f), theTime*speedFade);
 			timeDisplayed.color = Color.Lerp(timeDisplayed.color, new Color(1f, 1f, 1f, 0f), theTime*speedFade);
 			cache.color = Color.Lerp(cache.color, new Color(cache.color.r, cache.color.g, cache.color.b, 0.7f), theTime*speedFade);
 			theTime += Time.deltaTime;
