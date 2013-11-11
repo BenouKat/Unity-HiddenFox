@@ -25,6 +25,8 @@ public class Canon : MonoBehaviour {
 	private bool bulletShot;
 	private bool prepareBullet;
 	
+	public bool goOnStart = false;
+	
 	private bool activeCanon;
 	// Use this for initialization
 	void Start () {
@@ -39,6 +41,12 @@ public class Canon : MonoBehaviour {
 		speedRotate = 0f;
 		bulletShot = false;
 		prepareBullet = false;
+		
+		
+		if(goOnStart)
+		{
+			go ();
+		}
 		
 	}
 	
@@ -80,6 +88,17 @@ public class Canon : MonoBehaviour {
 		stopBullet();
 		reloadBullet();
 		prepareBullet = false;
+	}
+	
+	void OnEnable()
+	{
+		if(activeCanon)
+		{
+			Quaternion oldrotation = transform.rotation;
+			reset();
+			transform.rotation = oldrotation;
+			go ();
+		}
 	}
 	
 	public void go()

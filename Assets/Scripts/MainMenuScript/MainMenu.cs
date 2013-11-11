@@ -26,6 +26,19 @@ public class MainMenu : MonoBehaviour {
 		moving = false;
 		actualLevel = 0;
 		
+		for(int i=0; i<levelAppercu.Length;i++)
+		{
+			directionals[i].SetActive(false);
+			levelAppercu[i].SetActive(false);
+			levelTitle[i].SetActive(false);
+		}
+		directionals[actualLevel].SetActive(true);
+		levelAppercu[actualLevel].SetActive(true);
+		levelTitle[actualLevel].SetActive(true);
+		RenderSettings.ambientLight = ambiantColor[actualLevel];
+		Camera.main.GetComponent<Skybox>().material = SkyboxLevel[actualLevel];
+		Camera.main.GetComponent<DepthOfFieldScatter>().focalTransform = levelAppercu[actualLevel].transform.FindChild("Target");
+		
 	}
 	
 	// Update is called once per frame

@@ -1,6 +1,21 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GeneralScript\Player.cs">
+    <Files>
+      <File FileName="Assets\Scripts\GeneralScript\Rotate.cs" Line="16" Column="65" />
+      <File FileName="Assets\Scripts\CanonScript\Canon.cs" Line="97" Column="48" />
+      <File FileName="Assets\Scripts\MainMenuScript\MainMenu.cs" Line="48" Column="36" />
+      <File FileName="Assets\Scripts\EditorScript\EditorLevelManager.cs" Line="2312" Column="29" />
+      <File FileName="Assets\Scripts\GeneralScript\DynamicLoader.cs" Line="45" Column="45" />
+      <File FileName="Assets\Scripts\MainMenuScript\GoAndBack.cs" Line="19" Column="25" />
+      <File FileName="Assets\Scripts\GeneralScript\Gameplay.cs" Line="97" Column="13" />
+      <File FileName="Assets\Scripts\GeneralScript\UIManager.cs" Line="289" Column="16" />
+      <File FileName="Assets\Scripts\InternEngine\BDDLevelTime.cs" Line="63" Column="1" />
+      <File FileName="Assets\Scripts\GeneralScript\InputManager.cs" Line="194" Column="28" />
+      <File FileName="Assets\Scripts\CanonScript\Bullet.cs" Line="60" Column="1" />
+      <File FileName="Assets\Scripts\GeneralScript\Player.cs" Line="114" Column="33" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

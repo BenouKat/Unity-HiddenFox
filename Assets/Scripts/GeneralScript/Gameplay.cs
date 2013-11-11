@@ -99,6 +99,7 @@ public class Gameplay : MonoBehaviour {
 		thePlayer.GetComponent<Player>().resetPlayer();
 		thePlayer.SetActive(false);
 		desactiveAllDeathPlayer();
+		InputManager.instance.clear();
 		for(int i=0; i<playerDeath.transform.childCount; i++)
 		{
 			playerDeath.transform.GetChild(i).gameObject.SetActive(false);	

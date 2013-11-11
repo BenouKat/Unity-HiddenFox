@@ -188,5 +188,11 @@ public class InputManager : MonoBehaviour {
 		return keyResult == KeyCode.None ? KeyCode.None : getDirection(indexOf(getKeyInput()));
 	}
 	
+	public void clear()
+	{
+		queueKeyInput = new KeyCode[4]{KeyCode.None, KeyCode.None, KeyCode.None, KeyCode.None };
+		keyResult = KeyCode.None;
+		
+	}
 	
 }

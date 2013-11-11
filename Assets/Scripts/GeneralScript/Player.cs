@@ -4,6 +4,7 @@ using System.Collections;
 public class Player : MonoBehaviour {
 	
 	public GameObject cameraPlayer;
+	private MotionBlur mb;
 	public int positionSelected;
 	public ParticleSystem dashPS;
 	public ManaBar manabar;
@@ -58,7 +59,7 @@ public class Player : MonoBehaviour {
 		speed = basicSpeed;
 		actualMana = maxMana;
 		manabar.transform.gameObject.SetActive(true);
-		
+		mb = cameraPlayer.GetComponentInChildren<MotionBlur>();
 		cameraRotation = new GameObject[4];
 		
 		for(int i=1; i<5; i++)
@@ -97,7 +98,7 @@ public class Player : MonoBehaviour {
 			time = 0f;
 			if(!dashPS.gameObject.activeSelf) dashPS.gameObject.SetActive(true);
 			dashPS.Play();
-			
+			mb.enabled = true;
 			timeCooldown = Time.time;
 			actualMana -= manaCost;
 			manabar.loseMana(manaCost);
@@ -110,6 +111,7 @@ public class Player : MonoBehaviour {
 			{
 				speed = basicSpeed;
 				onDash = false;
+				Invoke("disableDash", 0.2f);
 			}
 			time += Time.deltaTime;
 		}
@@ -242,6 +244,11 @@ public class Player : MonoBehaviour {
 		cameraPlayer.transform.position = Vector3.SmoothDamp(cameraPlayer.transform.position, transform.position, ref velocity, 0.1f);
 	}
 	
+	public void disableDash()
+	{
+		mb.enabled = false;	
+	}
+	
 	public void resetPlayer()
 	{
 		speed = basicSpeed;
@@ -249,6 +256,7 @@ public class Player : MonoBehaviour {
 		actualMana = maxMana;
 		manabar.resetMana();
 		onDash = false;
+		mb.enabled = false;
 		enteringDash = false;
 		manabar.transform.gameObject.SetActive(true);
 		cameraPlayer.transform.position = transform.position;
