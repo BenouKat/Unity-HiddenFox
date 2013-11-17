@@ -6,6 +6,8 @@ public class Rotate : MonoBehaviour {
 	public float degreePerSecond;
 	
 	public Vector3 axe;
+	
+	public bool local;
 	// Use this for initialization
 	void Start () {
 	
@@ -13,6 +15,6 @@ public class Rotate : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		transform.Rotate(Time.deltaTime*degreePerSecond*axe.normalized);
+		transform.Rotate(Time.deltaTime*degreePerSecond*axe.normalized, local ? Space.Self : Space.World);
 	}
 }

@@ -22,7 +22,7 @@ public class Bullet : MonoBehaviour {
 		lensFlare = transform.GetComponentInChildren<LensFlare>();
 		ps = transform.FindChild("PS").particleSystem;
 		time = 0f;
-		if(!Application.loadedLevelName.Contains("Editor")) gameplay = GameObject.Find("Engine").GetComponent<Gameplay>();
+		if(!Application.loadedLevelName.Contains("Editor") && !Application.loadedLevelName.Contains("MainMenu") ) gameplay = GameObject.Find("Engine").GetComponent<Gameplay>();
 	}
 	
 	void Update()
@@ -65,7 +65,7 @@ public class Bullet : MonoBehaviour {
 	
 	void OnCollisionEnter(Collision c)
 	{
-		if(c.transform.name.Contains("Player"))
+		if(c.transform.name.Contains("Player") && gameplay != null)
 		{
 			gameplay.isDiscovered(null, "Canon");
 		}
